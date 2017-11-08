@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/layout_main"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/layout_side">
+
+        <TextView
+            android:id="@+id/tv_HeatingPower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Heating"
+            android:layout_margin="5dp"
+            android:textColor="#B06457"/>
+
+        <Switch
+            android:id="@+id/sw_HeatingPower"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_HeatingPower"
+            android:layout_marginLeft="10dp"/>
+
+
+        <TextView
+            android:id="@+id/tv_OutgoingMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/tv_HeatingPower"
+            android:layout_margin="5dp"
+            android:text="Outgoing"
+            android:textColor="#B06457"/>
+
+        <Switch
+            android:id="@+id/sw_OutgoingMode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_OutgoingMode"
+            android:layout_below="@+id/sw_HeatingPower"
+            android:layout_marginLeft="3dp"/>
+
+        <TextView
+            android:id="@+id/tv_Current"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/sw_HeatingPower"
+            android:text="Current"
+            android:textColor="#B06457"/>
+
+        <TextView
+            android:id="@+id/tv_CurrentTemp"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/desiredTemp"
+            android:layout_toRightOf="@+id/sw_OutgoingMode"
+            android:layout_marginLeft="10dp"
+            android:text="0"
+            android:textSize="28dp"
+            android:textStyle="bold"
+            android:textAlignment="gravity"
+            android:textColor="#B06457"/>
+
+        <TextView
+            android:id="@+id/tv_CurrentD"
+            android:layout_width="25dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/tv_CurrentTemp"
+            android:layout_below="@+id/tv_Current"
+            android:text="℃"
+            android:textSize="30dp"
+            android:textColor="#B06457"/>
+
+        <TextView
+            android:id="@+id/desiredTemp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/tv_CurrentD"
+            android:text="Setting"
+            android:textColor="#B06457"/>
+
+        <TextView
+            android:id="@+id/tv_desiredTemp"
+            android:layout_width="40dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/desiredTemp"
+            android:layout_toRightOf="@+id/tv_CurrentD"
+            android:layout_marginLeft="15dp"
+            android:text="0"
+            android:textAlignment="gravity"
+            android:textSize="28dp"
+            android:textColor="#B06457"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/tv_desired"
+            android:layout_width="25dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/tv_desiredTemp"
+            android:layout_below="@+id/desiredTemp"
+            android:text="℃"
+            android:textSize="30dp"
+            android:textColor="#B06457"/>
+
+        <Button
+            android:id="@+id/btn_up"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/tv_desired"
+            android:layout_marginTop="10dp"
+            android:textColor="#B06457"
+            android:text="▲"
+            android:background="#F9C4A4"
+            />
+        <Button
+            android:id="@+id/btn_down"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_toRightOf="@+id/tv_desired"
+            android:layout_below="@+id/btn_up"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            android:textColor="#B06457"
+            android:text="▼"
+            android:background="#F9C4A4"
+           />
+
+
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toRightOf="@+id/btn_up"
+            android:layout_marginLeft="5dp"
+            android:layout_centerVertical="true"
+            android:textColor="#B06457"
+            android:text="OK"
+            android:background="#F9C4A4"/>
+
+        <TextView
+            android:id="@+id/tv_roomName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@+id/btn_save"
+            android:layout_centerVertical="true"
+            android:text="Room1"
+            android:textColor="#B06457"/>
+        <Button
+            android:id="@+id/btn_del"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:text="-"
+            android:textColor="#B06457"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="#F9C4A4"/>
+    </RelativeLayout>
+
+</RelativeLayout>
