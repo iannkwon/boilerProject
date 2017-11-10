@@ -56,7 +56,7 @@
         <TextView
             android:id="@+id/tv_CurrentTemp"
             android:layout_width="40dp"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:layout_below="@+id/desiredTemp"
             android:layout_toRightOf="@+id/sw_OutgoingMode"
             android:layout_marginLeft="10dp"
@@ -87,7 +87,7 @@
         <TextView
             android:id="@+id/tv_desiredTemp"
             android:layout_width="40dp"
-            android:layout_height="50dp"
+            android:layout_height="30dp"
             android:layout_below="@+id/desiredTemp"
             android:layout_toRightOf="@+id/tv_CurrentD"
             android:layout_marginLeft="15dp"
@@ -106,6 +106,12 @@
             android:text="℃"
             android:textSize="30dp"
             android:textColor="#B06457"/>
+        <ImageView
+            android:id="@+id/iv_warm"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_below="@+id/tv_desiredTemp"
+            android:layout_marginLeft="200dp" />
 
         <Button
             android:id="@+id/btn_up"
@@ -137,8 +143,8 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_toRightOf="@+id/btn_up"
-            android:layout_marginLeft="5dp"
-            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="30dp"
             android:textColor="#B06457"
             android:text="OK"
             android:background="#F9C4A4"/>
@@ -147,10 +153,13 @@
             android:id="@+id/tv_roomName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@+id/btn_save"
+            android:layout_below="@+id/tv_CurrentTemp"
+            android:layout_marginLeft="100dp"
             android:layout_centerVertical="true"
             android:text="Room1"
-            android:textColor="#B06457"/>
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="#FC523D"/>
         <Button
             android:id="@+id/btn_del"
             android:layout_width="30dp"
@@ -158,7 +167,7 @@
             android:text="-"
             android:textColor="#B06457"
             android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
+            android:layout_marginTop="35dp"
             android:background="#F9C4A4"/>
     </RelativeLayout>
 

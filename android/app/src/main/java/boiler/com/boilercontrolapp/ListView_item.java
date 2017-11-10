@@ -1,5 +1,8 @@
 package boiler.com.boilercontrolapp;
 
+import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+
 /**
  * Created by Owner on 2017-10-31.
  */
@@ -12,6 +15,7 @@ public class ListView_item {
     private int desiredTemp;
     private String serialNum;
     private String roomName;
+    private int icon;
 
     public String getRoomName() {
         return roomName;
@@ -59,5 +63,13 @@ public class ListView_item {
 
     public void setDesiredTemp(int desiredTemp) {
         this.desiredTemp = desiredTemp;
+    }
+
+    public int getIcon() {
+        return icon;
+    }
+
+    public void setIcon(int icon) {
+        this.icon = icon;
     }
 }
