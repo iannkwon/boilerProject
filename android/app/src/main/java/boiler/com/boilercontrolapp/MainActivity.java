@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_name;
     TextView tv_serialNum;
     TextView tv_nicName;
+    TextView desiredTemp_text;
 
     RelativeLayout Rlayout;
 
@@ -77,6 +78,9 @@ public class MainActivity extends AppCompatActivity {
     String[] serialNum2 = new String[7];       // 제품 시리얼 번호
     String[] roomName2 = new String[7];        // 방 이름
 
+    int desireAvg;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
         tv_name = (TextView) findViewById(R.id.tv_name);
         tv_serialNum = (TextView) findViewById(R.id.tv_serialNum);
         tv_nicName = (TextView)findViewById(R.id.tv_nicName);
+        desiredTemp_text = (TextView)findViewById(R.id.desiredTemp);
         listView = (ListView) findViewById(R.id.container);
         Rlayout = (RelativeLayout)findViewById(R.id.Rlayout);
         //저장된 토큰값 출력
@@ -398,7 +403,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             JSONObject jobj = new JSONObject(result);
             JSONArray ja =  new JSONArray(jobj.getString("list"));
-
+            desireAvg = 0;
             dataLength = ja.length(); // 길이 저장
             for (int i = 0 ; i < ja.length()  ; i++) {
                 JSONObject order = ja.getJSONObject(i);
@@ -409,6 +414,9 @@ public class MainActivity extends AppCompatActivity {
                 desiredTemp2[i] = order.getString("desiredTemp");
                 serialNum2[i] = order.getString("serialNum");
                 roomName2[i] = order.getString("roomName");
+
+                // 각 현재온도 값의 합
+                desireAvg += Integer.parseInt(currentTemp2[i]);
             }
             setAdapter();
 
@@ -439,12 +447,66 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void buttonSetting() {
+
+        // 전체 난방
+        sw_allHeatingPower.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sw_allHeatingPower.isChecked()){
+                    sw_allHeatingPower.setChecked(true);
+                    tv_desiredTemp.setVisibility(View.VISIBLE);
+                    desiredTemp_text.setVisibility(View.VISIBLE);
+                    Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
+                    if (sw_allOutgoingMode.isChecked()){
+                        sw_allOutgoingMode.setChecked(false);
+                    }
+                    Log.i("avg",Integer.toString(desireAvg));
+                    // 각 현재온도의 평균
+                    tv_desiredTemp.setText(Integer.toString(desireAvg/dataLength));
+                    count = Integer.parseInt(tv_desiredTemp.getText().toString());
+                }else {
+                    sw_allHeatingPower.setChecked(false);
+                    Toast.makeText(MainActivity.this, "All Heating Off", Toast.LENGTH_SHORT).show();
+                    if (!sw_allOutgoingMode.isChecked()){
+                        tv_desiredTemp.setVisibility(View.INVISIBLE);
+                        desiredTemp_text.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+        });
+
+        sw_allOutgoingMode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 전체 외출
+                if (sw_allOutgoingMode.isChecked()){
+                    sw_allOutgoingMode.setChecked(true);
+                    tv_desiredTemp.setVisibility(View.VISIBLE);
+                    desiredTemp_text.setVisibility(View.VISIBLE);
+                    tv_desiredTemp.setText("18");
+                    count = Integer.parseInt(tv_desiredTemp.getText().toString());
+                    Toast.makeText(MainActivity.this, "All OutgoingMode On", Toast.LENGTH_SHORT).show();
+                    if (sw_allHeatingPower.isChecked()){
+                        sw_allHeatingPower.setChecked(false);
+                    }
+                }else {
+                    sw_allOutgoingMode.setChecked(false);
+                    Toast.makeText(MainActivity.this, "All OutgoingMode Off", Toast.LENGTH_SHORT).show();
+                    if (!sw_allHeatingPower.isChecked()){
+                        tv_desiredTemp.setVisibility(View.INVISIBLE);
+                        desiredTemp_text.setVisibility(View.INVISIBLE);
+                    }
+                }
+            }
+        });
+
         // 현재 온도값 가져오기
         count = Integer.parseInt(tv_desiredTemp.getText().toString());
         // 온도 상승 버튼
         btn_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Log.i("tv_desired",tv_desiredTemp.getText().toString());
                 if (count <45) { // 온도 45도 이하일 때
                     count++;
                     tv_desiredTemp.setText("" + count);
@@ -459,43 +521,12 @@ public class MainActivity extends AppCompatActivity {
                 if (count>10) { // 온도 10도 이상일 때
                     count--;
                     tv_desiredTemp.setText("" + count);
+
                 }
 
 
             }
         });
-        // 전체 난방
-        sw_allHeatingPower.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (sw_allHeatingPower.isChecked()){
-                    sw_allHeatingPower.setChecked(true);
-                    Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
-                    sw_allOutgoingMode.setChecked(false);
-                }else {
-                    sw_allHeatingPower.setChecked(false);
-                    Toast.makeText(MainActivity.this, "All Heating Off", Toast.LENGTH_SHORT).show();
-                    sw_allOutgoingMode.setChecked(true);
-                }
-            }
-        });
-
-        sw_allOutgoingMode.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 전체 외출
-                if (sw_allOutgoingMode.isChecked()){
-                    sw_allOutgoingMode.setChecked(true);
-                    Toast.makeText(MainActivity.this, "All OutgoingMode On", Toast.LENGTH_SHORT).show();
-                    sw_allHeatingPower.setChecked(false);
-                }else {
-                    sw_allOutgoingMode.setChecked(false);
-                    Toast.makeText(MainActivity.this, "All OutgoingMode Off", Toast.LENGTH_SHORT).show();
-                    sw_allHeatingPower.setChecked(true);
-                }
-            }
-        });
-
 
 
     }
