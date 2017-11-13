@@ -64,6 +64,7 @@ public class MainActivity extends AppCompatActivity {
     String link = "http://192.168.77.104:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
     String link_2 = "http://192.168.77.104:8090/BoilerControl/heatingSearch.do"; // 받는 주소
     String link_3 = "http://192.168.77.104:8090/BoilerControl/heatingInsert.do"; // 방 추가
+    String link_4 = "http://192.168.77.104:8090/BoilerControl/heatingDelete.do"; //삭제
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
@@ -114,6 +115,8 @@ public class MainActivity extends AppCompatActivity {
         getHeatingInfo();
         // 일정 간격 새로고침
         refresh();
+
+
     }
     private Timer timer;
     private TimerTask timerTask;
@@ -439,6 +442,106 @@ public class MainActivity extends AppCompatActivity {
         }
         listView.setAdapter(adapter);
 
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, int i, long l) {
+
+               AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+               ab.setTitle("Delete");
+               ab.setMessage("Are you renove?");
+               ab.setPositiveButton("delete", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialogInterface, int i) {
+                       ListView_Adapter listView_adapter = new ListView_Adapter(getApplicationContext());
+                       ((ListView_item) adapter.getItem(i)).getSerialNum();
+                       serialNum = ((ListView_item) adapter.getItem(i)).getSerialNum().toString();
+                       deleteDo();
+                       getHeatingInfo();
+                       Toast.makeText(getApplicationContext(), "Delete Successed",Toast.LENGTH_SHORT).show();
+
+                   }
+               });
+               ab.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                   @Override
+                   public void onClick(DialogInterface dialogInterface, int i) {
+
+                   }
+               });
+               ab.show();
+
+               return true;
+            }
+        });
+
+
+    }
+
+    public void deleteDo(){
+        class DeleteData extends AsyncTask<String, Void, String> {
+            ProgressDialog loading;
+            @Override
+            protected void onPreExecute() {
+//                loading = ProgressDialog.show(mContext,"온도 전송 중..",null, true, true);
+                super.onPreExecute();
+            }
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    String link2 = params[0];             // 접속 주소
+                    String serialNum2 = params[1];        // 시리얼 넘버
+
+                    Log.i("insertDo link2",params[0]);
+                    Log.i("insertDo serialNum2",params[1]);
+
+                    String data ="&serialNum=" + URLEncoder.encode(serialNum2, "UTF-8");
+
+                    Log.i("send data",data);
+
+                    // URL설정
+                    URL url = new URL(link2);
+                    // 접속
+                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                    // 서버로 쓰기 보드 지정 cf.setDoInput = 서버에서 읽기모드 지정
+                    con.setDoOutput(true);
+
+                    OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                    Log.i("Delete URL","OK");
+                    wr.write(data);  // 출력 스트림에 출력
+                    wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
+
+                    // Get the response
+                    StringBuilder sb = new StringBuilder();
+
+                    // 요청한 URL의 출력물을 BufferedReader로 받는다.
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String json;
+
+                    // 라인을 받아와 합친다
+                    // 서버에서 라인단위로 보내줄 것이므로 라인 단위로 받는다
+                    while ((json = br.readLine()) != null) {
+                        sb.append(json);
+                    }
+                    // 전송 결과를 전역변수에 저장
+                    return sb.toString();
+
+                } catch (Exception e) {
+                    return null;
+                }
+
+            } // end doln
+
+            @Override
+            protected void onPostExecute(String result) {
+//                loading.dismiss(); //다이얼 로그 종료
+                super.onPostExecute(result);
+//                if (result != null){
+//                    deleteResult(result);
+//                }
+            }
+        }//insertData
+        DeleteData task = new DeleteData();
+        task.execute(link_4,serialNum);
     }
 
 

@@ -64,7 +64,6 @@ public class ListView_Adapter extends BaseAdapter {
     private Button btn_up;
     private Button btn_down;
     private Button btn_save;
-    private Button btn_del;
     private ImageView iv_warm;
 
     double count;
@@ -131,7 +130,6 @@ public class ListView_Adapter extends BaseAdapter {
         btn_up = (Button) convertView.findViewById(R.id.btn_up);
         btn_down = (Button) convertView.findViewById(R.id.btn_down);
         btn_save = (Button) convertView.findViewById(R.id.btn_save);
-        btn_del = (Button) convertView.findViewById(R.id.btn_del);
         iv_warm = (ImageView)convertView.findViewById(R.id.iv_warm);
 
 
@@ -365,34 +363,6 @@ public class ListView_Adapter extends BaseAdapter {
             }
         });
 
-        // 삭제 버튼
-        btn_del.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // 삭제 실행
-//                serialNum = ((ListView_item) getItem(position)).getSerialNum();
-//
-//                deleteDo();
-//                Toast.makeText(mContext, "Delete ",Toast.LENGTH_SHORT).show();
-//                AlertDialog.Builder ab = new AlertDialog.Builder();
-//                ab.setTitle("Delete");
-//                ab.setMessage("Are you delete?");
-//                ab.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//
-//                    }
-//                });
-//                ab.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialogInterface, int i) {
-//
-//                    }
-//                });
-//                ab.show();
-
-            }
-        });
         // 완성된 뷰를 반환
         return convertView;
     }
@@ -480,75 +450,6 @@ public class ListView_Adapter extends BaseAdapter {
         InsertData task = new InsertData();
         task.execute(link,heatingPower,outGoingMode,currentTemp,desiredTemp,heatingtime,serialNum,roomName);
     } //end insertDo
-
-    // 삭제
-    private void deleteDo(){
-        class DeleteData extends AsyncTask<String, Void, String> {
-            ProgressDialog loading;
-            @Override
-            protected void onPreExecute() {
-//                loading = ProgressDialog.show(mContext,"온도 전송 중..",null, true, true);
-                super.onPreExecute();
-            }
-            @Override
-            protected String doInBackground(String... params) {
-                try {
-                    String link2 = params[0];             // 접속 주소
-                    String serialNum2 = params[1];        // 시리얼 넘버
-
-                    Log.i("insertDo link2",params[0]);
-                    Log.i("insertDo serialNum2",params[1]);
-
-                    String data ="&serialNum=" + URLEncoder.encode(serialNum2, "UTF-8");
-
-                    Log.i("send data",data);
-
-                    // URL설정
-                    URL url = new URL(link2);
-                    // 접속
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-                    // 서버로 쓰기 보드 지정 cf.setDoInput = 서버에서 읽기모드 지정
-                    con.setDoOutput(true);
-
-                    OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-                    Log.i("Delete URL","OK");
-                    wr.write(data);  // 출력 스트림에 출력
-                    wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
-
-                    // Get the response
-                    StringBuilder sb = new StringBuilder();
-
-                    // 요청한 URL의 출력물을 BufferedReader로 받는다.
-                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    String json;
-
-                    // 라인을 받아와 합친다
-                    // 서버에서 라인단위로 보내줄 것이므로 라인 단위로 받는다
-                    while ((json = br.readLine()) != null) {
-                        sb.append(json);
-                    }
-                    // 전송 결과를 전역변수에 저장
-                    return sb.toString();
-
-                } catch (Exception e) {
-                    return null;
-                }
-
-            } // end doln
-
-            @Override
-            protected void onPostExecute(String result) {
-//                loading.dismiss(); //다이얼 로그 종료
-                super.onPostExecute(result);
-//                if (result != null){
-//                    deleteResult(result);
-//                }
-            }
-        }//insertData
-        DeleteData task = new DeleteData();
-        task.execute(link_2,serialNum);
-    }
 
     // 데이터 추가를 위해 만듬
     public void add(int heatingPower, int outgoingMode, double currentTemp, double desiredTemp,String serialNum,String roomNam){
