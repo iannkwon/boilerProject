@@ -12,8 +12,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Switch;
@@ -52,10 +54,11 @@ public class MainActivity extends AppCompatActivity {
     TextView tv_serialNum;
     TextView tv_nicName;
     TextView desiredTemp_text;
+    ImageView iv_warm;
 
     RelativeLayout Rlayout;
 
-    int count;
+    double count;
     int dataLength;
 
     String link = "http://192.168.77.104:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
@@ -74,7 +77,6 @@ public class MainActivity extends AppCompatActivity {
     String[] outGoingMode2 = new String[7];    // 외출 모드 값
     String[] currentTemp2 = new String[7];     // 현재 온도 값
     String[] desiredTemp2 = new String[7];      // 희망 온도 값
-    String[] heatingtime2 = new String[7];     // 시간
     String[] serialNum2 = new String[7];       // 제품 시리얼 번호
     String[] roomName2 = new String[7];        // 방 이름
 
@@ -99,30 +101,25 @@ public class MainActivity extends AppCompatActivity {
         desiredTemp_text = (TextView)findViewById(R.id.desiredTemp);
         listView = (ListView) findViewById(R.id.container);
         Rlayout = (RelativeLayout)findViewById(R.id.Rlayout);
+        iv_warm = (ImageView)findViewById(R.id.iv_warm);
         //저장된 토큰값 출력
         showtoken();
         // 버튼 설정
         buttonSetting();
         // 데이터 전송
         sendOk();
-
         // 제품 추가
         addRoom();
-
         // 서버에서 데이터 받아오기
         getHeatingInfo();
         // 일정 간격 새로고침
         refresh();
-
-
     }
     private Timer timer;
     private TimerTask timerTask;
 
     // 일정 간격마다 새로고침
     private void refresh(){
-//                Timer timer;
-//                TimerTask timerTask;
 
                 timer = new Timer();
 
@@ -146,7 +143,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 };
-                timer.schedule(timerTask, 1000, 30000);    // 1초 후부터 30초 마다
+                timer.schedule(timerTask, 1000, 30000);    // 30초 후부터 30초 마다
 
 
             }
@@ -434,8 +431,8 @@ public class MainActivity extends AppCompatActivity {
         for (int i=0 ; i < dataLength; i++){
             adapter.add(Integer.parseInt(heatingPower2[i]),
                     Integer.parseInt(outGoingMode2[i]),
-                    Integer.parseInt(currentTemp2[i]),
-                    Integer.parseInt(desiredTemp2[i]),
+                    Double.parseDouble(currentTemp2[i]),
+                    Double.parseDouble(desiredTemp2[i]),
                     serialNum2[i],
                     roomName2[i]);
             adapter.notifyDataSetChanged();
@@ -447,7 +444,8 @@ public class MainActivity extends AppCompatActivity {
 
 
     private void buttonSetting() {
-
+        tv_desiredTemp.setVisibility(View.INVISIBLE);
+        desiredTemp_text.setVisibility(View.INVISIBLE);
         // 전체 난방
         sw_allHeatingPower.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -456,20 +454,22 @@ public class MainActivity extends AppCompatActivity {
                     sw_allHeatingPower.setChecked(true);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     desiredTemp_text.setVisibility(View.VISIBLE);
+                    iv_warm.setImageResource(R.drawable.wariming);
                     Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
                     if (sw_allOutgoingMode.isChecked()){
                         sw_allOutgoingMode.setChecked(false);
                     }
                     Log.i("avg",Integer.toString(desireAvg));
                     // 각 현재온도의 평균
-                    tv_desiredTemp.setText(Integer.toString(desireAvg/dataLength));
-                    count = Integer.parseInt(tv_desiredTemp.getText().toString());
+                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
+                    count = Double.parseDouble(tv_desiredTemp.getText().toString());
                 }else {
                     sw_allHeatingPower.setChecked(false);
                     Toast.makeText(MainActivity.this, "All Heating Off", Toast.LENGTH_SHORT).show();
                     if (!sw_allOutgoingMode.isChecked()){
                         tv_desiredTemp.setVisibility(View.INVISIBLE);
                         desiredTemp_text.setVisibility(View.INVISIBLE);
+                        iv_warm.setImageResource(0);
                     }
                 }
             }
@@ -483,8 +483,9 @@ public class MainActivity extends AppCompatActivity {
                     sw_allOutgoingMode.setChecked(true);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     desiredTemp_text.setVisibility(View.VISIBLE);
+                    iv_warm.setImageResource(R.drawable.goingout);
                     tv_desiredTemp.setText("18");
-                    count = Integer.parseInt(tv_desiredTemp.getText().toString());
+                    count = Double.parseDouble(tv_desiredTemp.getText().toString());
                     Toast.makeText(MainActivity.this, "All OutgoingMode On", Toast.LENGTH_SHORT).show();
                     if (sw_allHeatingPower.isChecked()){
                         sw_allHeatingPower.setChecked(false);
@@ -495,20 +496,23 @@ public class MainActivity extends AppCompatActivity {
                     if (!sw_allHeatingPower.isChecked()){
                         tv_desiredTemp.setVisibility(View.INVISIBLE);
                         desiredTemp_text.setVisibility(View.INVISIBLE);
+                        iv_warm.setImageResource(0);
                     }
                 }
             }
         });
 
         // 현재 온도값 가져오기
-        count = Integer.parseInt(tv_desiredTemp.getText().toString());
+//        count = Integer.parseInt(tv_desiredTemp.getText().toString());
+        count = Double.parseDouble(tv_desiredTemp.getText().toString());
         // 온도 상승 버튼
+
         btn_up.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Log.i("tv_desired",tv_desiredTemp.getText().toString());
-                if (count <45) { // 온도 45도 이하일 때
-                    count++;
+                if (count <45 && (sw_allHeatingPower.isChecked() || sw_allOutgoingMode.isChecked() ) ) { // 온도 45도 이하일 때
+                    count += 0.5;
                     tv_desiredTemp.setText("" + count);
                 }
             }
@@ -519,7 +523,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (count>10) { // 온도 10도 이상일 때
-                    count--;
+                    count-= 0.5;
                     tv_desiredTemp.setText("" + count);
 
                 }

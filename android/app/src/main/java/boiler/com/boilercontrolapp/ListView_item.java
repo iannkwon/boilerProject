@@ -11,8 +11,8 @@ public class ListView_item {
 
     private int heatingPower;
     private int outgoingMode;
-    private int currentTemp;
-    private int desiredTemp;
+    private double currentTemp;
+    private double desiredTemp;
     private String serialNum;
     private String roomName;
     private int icon;
@@ -49,19 +49,19 @@ public class ListView_item {
         this.outgoingMode = outgoingMode;
     }
 
-    public int getCurrentTemp() {
+    public double getCurrentTemp() {
         return currentTemp;
     }
 
-    public void setCurrentTemp(int currentTemp) {
+    public void setCurrentTemp(double currentTemp) {
         this.currentTemp = currentTemp;
     }
 
-    public int getDesiredTemp() {
+    public double getDesiredTemp() {
         return desiredTemp;
     }
 
-    public void setDesiredTemp(int desiredTemp) {
+    public void setDesiredTemp(double desiredTemp) {
         this.desiredTemp = desiredTemp;
     }
 

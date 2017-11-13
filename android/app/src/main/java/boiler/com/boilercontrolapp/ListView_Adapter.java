@@ -67,7 +67,7 @@ public class ListView_Adapter extends BaseAdapter {
     private Button btn_del;
     private ImageView iv_warm;
 
-    int count;
+    double count;
 
     String link = "http://192.168.77.104:8090/BoilerControl/heatingUpdate.do"; // 데이터 보내는 주소
     String link_2 = "http://192.168.77.104:8090/BoilerControl/heatingDelete.do"; // 삭제
@@ -148,8 +148,8 @@ public class ListView_Adapter extends BaseAdapter {
 
         // 데이터의 실존 여부를 판별
         if (mItem != null) {
-            tv_currentTemp.setText(Integer.toString(((ListView_item) getItem(position)).getCurrentTemp()));
-            tv_desiredTemp.setText(Integer.toString(((ListView_item) getItem(position)).getDesiredTemp()));
+            tv_currentTemp.setText(Double.toString(((ListView_item) getItem(position)).getCurrentTemp()));
+            tv_desiredTemp.setText(Double.toString(((ListView_item) getItem(position)).getDesiredTemp()));
             tv_roomName.setText(((ListView_item) getItem(position)).getRoomName());
             iv_warm.setImageResource(((ListView_item) getItem(position)).getIcon());
             // 데이터가 있다면 갖고 있는 정보를 뷰에 알맞게 배치
@@ -222,7 +222,7 @@ public class ListView_Adapter extends BaseAdapter {
                     notifyDataSetChanged();
                     if ( ((ListView_item) getItem(position)).getOutgoingMode() == 1 ){
                         ((ListView_item) getItem(position)).setOutgoingMode(0);
-
+                        ((ListView_item) getItem(position)).setIcon(0);
                         notifyDataSetChanged();
                     }
 //
@@ -288,9 +288,10 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View v) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count < 45) { // 온도 45도 이하일 때
-                    count++;
-                    Log.i("count", Integer.toString(count));
+                if (count < 45 && ( ((ListView_item) getItem(position)).getHeatingPower()==1 ||
+                        ((ListView_item) getItem(position)).getOutgoingMode()==1 ) ) { // 온도 45도 이하일 때
+                    count+=0.5;
+                    Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도 올리기
                     ((ListView_item) getItem(position)).setDesiredTemp(count);
                     notifyDataSetChanged();
@@ -316,9 +317,10 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View view) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count > 10) { // 온도 45도 이하일 때
-                    count--;
-                    Log.i("count", Integer.toString(count));
+                if (count > 10  && ( ((ListView_item) getItem(position)).getHeatingPower()==1 ||
+                        ((ListView_item) getItem(position)).getOutgoingMode()==1 ) ) { // 온도 45도 이하일 때
+                    count-=0.5;
+                    Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도에 값 셋팅
                     ((ListView_item) getItem(position)).setDesiredTemp(count);
                     notifyDataSetChanged();
@@ -338,8 +340,8 @@ public class ListView_Adapter extends BaseAdapter {
                 // 각 값들 가져오기
                 heatingPower = Integer.toString(((ListView_item) getItem(position)).getHeatingPower());
                 outGoingMode = Integer.toString(((ListView_item) getItem(position)).getOutgoingMode());
-                currentTemp = Integer.toString(((ListView_item) getItem(position)).getCurrentTemp());
-                desiredTemp = Integer.toString(((ListView_item) getItem(position)).getDesiredTemp());
+                currentTemp = Double.toString(((ListView_item) getItem(position)).getCurrentTemp());
+                desiredTemp = Double.toString(((ListView_item) getItem(position)).getDesiredTemp());
                 // 현재 시간 가져오기
                 long rNow = System.currentTimeMillis();
                 // 현재 시간을 date변수에 저장한다.
@@ -549,7 +551,7 @@ public class ListView_Adapter extends BaseAdapter {
     }
 
     // 데이터 추가를 위해 만듬
-    public void add(int heatingPower, int outgoingMode, int currentTemp, int desiredTemp,String serialNum,String roomNam){
+    public void add(int heatingPower, int outgoingMode, double currentTemp, double desiredTemp,String serialNum,String roomNam){
         ListView_item item = new ListView_item();
         item.setHeatingPower(heatingPower);
         item.setOutgoingMode(outgoingMode);
