@@ -61,10 +61,10 @@ public class MainActivity extends AppCompatActivity {
     double count;
     int dataLength;
 
-    String link = "http://192.168.77.104:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
-    String link_2 = "http://192.168.77.104:8090/BoilerControl/heatingSearch.do"; // 받는 주소
-    String link_3 = "http://192.168.77.104:8090/BoilerControl/heatingInsert.do"; // 방 추가
-    String link_4 = "http://192.168.77.104:8090/BoilerControl/heatingDelete.do"; //삭제
+    String link = "http://192.168.77.105:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+    String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+    String link_3 = "http://192.168.77.105:8090/BoilerControl/heatingInsert.do"; // 방 추가
+    String link_4 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; //삭제
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
@@ -445,28 +445,41 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(final AdapterView<?> adapterView, View view, int i, long l) {
-
+                final String[] abList = {"Modify","Delete"};
                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
-               ab.setTitle("Delete");
-               ab.setMessage("Are you renove?");
-               ab.setPositiveButton("delete", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
-                       ListView_Adapter listView_adapter = new ListView_Adapter(getApplicationContext());
-                       ((ListView_item) adapter.getItem(i)).getSerialNum();
-                       serialNum = ((ListView_item) adapter.getItem(i)).getSerialNum().toString();
-                       deleteDo();
-                       getHeatingInfo();
-                       Toast.makeText(getApplicationContext(), "Delete Successed",Toast.LENGTH_SHORT).show();
+               ab.setItems(abList, new DialogInterface.OnClickListener() {
+                           @Override
+                           public void onClick(DialogInterface dialogInterface, int i) {
 
-                   }
-               });
-               ab.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(DialogInterface dialogInterface, int i) {
+                               serialNum = ((ListView_item) adapter.getItem(i)).getSerialNum().toString();
 
-                   }
-               });
+                               switch (abList[i]){
+                                   case "Modify":
+                                       Toast.makeText(getApplicationContext(), abList[i], Toast.LENGTH_SHORT).show();
+                                       break;
+                                   case "Delete":
+                                       AlertDialog.Builder abDel = new AlertDialog.Builder(MainActivity.this);
+                                       abDel.setTitle("Delete");
+                                       abDel.setMessage("Are you really remove your room?");
+                                       abDel.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                                           @Override
+                                           public void onClick(DialogInterface dialogInterface, int i) {
+                                               deleteDo();
+                                               getHeatingInfo();
+                                               Toast.makeText(getApplicationContext(), "Delete Successed", Toast.LENGTH_SHORT).show();
+
+                                           }
+                                       });
+                                       abDel.setNegativeButton("cancel", new DialogInterface.OnClickListener() {
+                                           @Override
+                                           public void onClick(DialogInterface dialogInterface, int i) {
+                                           }
+                                       });
+                                       abDel.show();
+                                       break;
+                               }
+                           }
+                       });
                ab.show();
 
                return true;

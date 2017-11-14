@@ -39,7 +39,7 @@ String password;
 String passwordOk;
 String joinDate;
 
-String link = "http://192.168.77.104:8090/BoilerControl/memberGo.do";
+String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

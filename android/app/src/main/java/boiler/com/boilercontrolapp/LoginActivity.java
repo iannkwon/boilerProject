@@ -33,7 +33,7 @@ public class LoginActivity extends AppCompatActivity {
     String apartNumber; // 호수
     String password;    // 비밀번호
 
-    String link = "http://192.168.77.104:8090/BoilerControl/loginGo.do";
+    String link = "http://192.168.77.105:8090/BoilerControl/loginGo.do";
 
 
     @Override
