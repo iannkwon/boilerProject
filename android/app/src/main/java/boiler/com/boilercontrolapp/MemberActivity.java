@@ -27,6 +27,7 @@ EditText et_id;
 EditText et_nicname;
 EditText et_password;
 EditText et_passwordOk;
+EditText et_serialNum;
 
 LinearLayout layout2;
 Button btn_ok;
@@ -36,6 +37,7 @@ String nicName;
 String password;
 String passwordOk;
 String joinDate;
+String serialNum;
 
 String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
 
@@ -91,6 +93,7 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
         et_nicname = (EditText)findViewById(R.id.et_nicName);
         et_password = (EditText)findViewById(R.id.et_password);
         et_passwordOk = (EditText)findViewById(R.id.et_password2);
+        et_serialNum = (EditText)findViewById(R.id.et_serialNum);
 
 
 //        Log.i("apartComplex",apartComplex);
@@ -108,6 +111,7 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
         nicName = et_nicname.getText().toString();             // 닉네임
         password = et_password.getText().toString();           // 패스워드
         passwordOk = et_passwordOk.getText().toString();      // 패스워드 확인
+        serialNum = et_serialNum.getText().toString();      // 패스워드 확인
 
         Log.i("getInfo","ok");
     }
@@ -130,11 +134,13 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
                     String  password2= params[2];         // 아파트 호수
                     String  nicName2= params[3];        // 비밀번호
                     String joinDate2 = params[4];        // 가입 시간
+                    String serialNum2 = params[5];        // 가입 시간
 
                     String data1 = "id="+ URLEncoder.encode(id2, "UTF-8");
                     data1 += "&password="+URLEncoder.encode(password2, "UTF-8");
                     data1 += "&nicName="+URLEncoder.encode(nicName2, "UTF-8");
                     data1 += "&joinDate="+URLEncoder.encode(joinDate2, "UTF-8");
+                    data1 += "&serialNum="+URLEncoder.encode(serialNum2, "UTF-8");
                     URL url = new URL(link2);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
 
@@ -170,18 +176,20 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
             }
         } // end SendLogData
         SendLogData sld = new SendLogData();
-        sld.execute(link,id,password,nicName,joinDate);
+        sld.execute(link,id,password,nicName,joinDate,serialNum);
     }
 
     //가입후 결과
     private void showgo1(String re1){
         if(re1.equals("idFail")){
-            Toast.makeText(getApplicationContext(),"id Check",Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(),"Please check id ",Toast.LENGTH_LONG).show();
         }if(re1.equals("nicFail")){
-            Toast.makeText(getApplicationContext(),"duplicated Nicname",Toast.LENGTH_LONG).show();
-        }if(re1.equals("joinfail")){
+            Toast.makeText(getApplicationContext(),"Please check nicname, duplicated nicname",Toast.LENGTH_LONG).show();
+        }if (re1.equals("serialFail")){
+            Toast.makeText(getApplicationContext(),"Please check serial number",Toast.LENGTH_LONG).show();
+        }if(re1.equals("joinFail")){
             Toast.makeText(getApplicationContext(),"Member Register Failed",Toast.LENGTH_LONG).show();
-        }else if(re1.equals("joinsuccess")){
+        } else if(re1.equals("joinSuccess")){
             Toast.makeText(getApplicationContext(),"Member Register Successed",Toast.LENGTH_LONG).show();
             SessionNow.setSession(this,"token1", re1);
             Intent in=new Intent(MemberActivity.this,LoginActivity.class);

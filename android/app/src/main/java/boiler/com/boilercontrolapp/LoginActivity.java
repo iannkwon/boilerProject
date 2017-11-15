@@ -11,6 +11,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -24,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     EditText et_id;
     EditText et_pw;
 
-    Button btn_member;
+    TextView tv_member;
 
     LinearLayout layout1;
 
@@ -59,9 +60,9 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void memberGO(){
-        btn_member = (Button)findViewById(R.id.btn_member);
+        tv_member = (TextView) findViewById(R.id.tv_member);
 
-        btn_member.setOnClickListener(new View.OnClickListener() {
+        tv_member.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(LoginActivity.this, MemberActivity.class);

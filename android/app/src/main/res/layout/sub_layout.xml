@@ -171,16 +171,9 @@
             android:text="Room1"
             android:textSize="20dp"
             android:textStyle="bold"
-            android:textColor="#FC523D"/>
-        <!--<Button-->
-            <!--android:id="@+id/btn_del"-->
-            <!--android:layout_width="30dp"-->
-            <!--android:layout_height="30dp"-->
-            <!--android:text="-"-->
-            <!--android:textColor="#B06457"-->
-            <!--android:layout_alignParentEnd="true"-->
-            <!--android:layout_marginTop="35dp"-->
-            <!--android:background="#F9C4A4"/>-->
+            android:textColor="#FC523D"
+            android:maxLength="15"
+            android:maxLines="1"/>
     </RelativeLayout>
 
 </RelativeLayout>
