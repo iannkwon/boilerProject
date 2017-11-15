@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingSearch.do"; // 받는 주소
     String link_3 = "http://192.168.77.105:8090/BoilerControl/heatingInsert.do"; // 방 추가
     String link_4 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; //삭제
-    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //삭제
+    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //방 이름 변경
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값

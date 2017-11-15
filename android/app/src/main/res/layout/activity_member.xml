@@ -20,31 +20,19 @@
         android:layout_marginTop="30dp"
         android:textSize="40dp"/>
     <EditText
-        android:id="@+id/et_apartComplex"
+        android:id="@+id/et_id"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:hint="ApartComplex"
+        android:hint="ID"
         android:textColorHint="#E5E2DB"
-        android:inputType="number"
+        android:inputType="text"
         android:textAlignment="center"
         android:textColor="#E5E2DB"
         android:maxLines="1"
-        android:maxLength="5"
+        android:maxLength="10"
         android:layout_gravity="center"
         android:layout_marginTop="50dp"/>
 
-    <EditText
-        android:id="@+id/et_apartNumber"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:hint="Apart Number"
-        android:textColorHint="#E5E2DB"
-        android:inputType="number"
-        android:textAlignment="center"
-        android:textColor="#E5E2DB"
-        android:maxLines="1"
-        android:maxLength="5"
-        android:layout_gravity="center"/>
 
     <EditText
         android:id="@+id/et_nicName"

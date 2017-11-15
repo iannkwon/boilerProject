@@ -23,8 +23,7 @@ import java.util.Date;
 
 public class MemberActivity extends AppCompatActivity {
 
-EditText et_apartcomplex;
-EditText et_apartnumber;
+EditText et_id;
 EditText et_nicname;
 EditText et_password;
 EditText et_passwordOk;
@@ -32,8 +31,7 @@ EditText et_passwordOk;
 LinearLayout layout2;
 Button btn_ok;
 
-String apartComplex;
-String apartNumber;
+String id;
 String nicName;
 String password;
 String passwordOk;
@@ -74,7 +72,7 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
                 getInfo(); // 회원정보
 
                 // 내용이 빈값일 때 저장못하게 하기
-                if (apartComplex.equals("") || apartNumber.equals("") || nicName.equals("") || password.equals("") || passwordOk.equals("")){
+                if (id.equals("") || nicName.equals("") || password.equals("") || passwordOk.equals("")){
                     Toast.makeText(getApplicationContext(), "No Values", Toast.LENGTH_SHORT).show();
                 }else if (!password.equals(passwordOk)){
                     Toast.makeText(getApplicationContext(), "password Check", Toast.LENGTH_SHORT).show();
@@ -89,8 +87,7 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
     // 회원정보 가져오기
     private void getInfo(){
 
-        et_apartcomplex = (EditText)findViewById(R.id.et_apartComplex);
-        et_apartnumber = (EditText)findViewById(R.id.et_apartNumber);
+        et_id = (EditText)findViewById(R.id.et_id);
         et_nicname = (EditText)findViewById(R.id.et_nicName);
         et_password = (EditText)findViewById(R.id.et_password);
         et_passwordOk = (EditText)findViewById(R.id.et_password2);
@@ -107,8 +104,7 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
         // nowDate 변수에 값을 저장한다
         joinDate = sdfNow.format(date); //시간
 
-        apartComplex = et_apartcomplex.getText().toString(); // 동 번호
-        apartNumber = et_apartnumber.getText().toString();    // 아파트 호수
+        id = et_id.getText().toString(); // 동 번호
         nicName = et_nicname.getText().toString();             // 닉네임
         password = et_password.getText().toString();           // 패스워드
         passwordOk = et_passwordOk.getText().toString();      // 패스워드 확인
@@ -130,14 +126,12 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
             protected String doInBackground(String... params) {
                 try {
                     String link2 = params[0];            // 접속 주소
-                    String apartComplex2 = params[1];    // 아파트 동
-                    String apartNumber2 = params[2];     // 아파트 호수
-                    String  password2= params[3];         // 아파트 호수
-                    String  nicName2= params[4];        // 비밀번호
-                    String joinDate2 = params[5];        // 가입 시간
+                    String id2 = params[1];    // 아파트 동
+                    String  password2= params[2];         // 아파트 호수
+                    String  nicName2= params[3];        // 비밀번호
+                    String joinDate2 = params[4];        // 가입 시간
 
-                    String data1 = "apartComplex="+ URLEncoder.encode(apartComplex2, "UTF-8");
-                    data1 += "&apartNumber="+URLEncoder.encode(apartNumber2, "UTF-8");
+                    String data1 = "id="+ URLEncoder.encode(id2, "UTF-8");
                     data1 += "&password="+URLEncoder.encode(password2, "UTF-8");
                     data1 += "&nicName="+URLEncoder.encode(nicName2, "UTF-8");
                     data1 += "&joinDate="+URLEncoder.encode(joinDate2, "UTF-8");
@@ -176,13 +170,13 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
             }
         } // end SendLogData
         SendLogData sld = new SendLogData();
-        sld.execute(link,apartComplex,apartNumber,password,nicName,joinDate);
+        sld.execute(link,id,password,nicName,joinDate);
     }
 
     //가입후 결과
     private void showgo1(String re1){
-        if(re1.equals("apartFail")){
-            Toast.makeText(getApplicationContext(),"apart Number Check",Toast.LENGTH_LONG).show();
+        if(re1.equals("idFail")){
+            Toast.makeText(getApplicationContext(),"id Check",Toast.LENGTH_LONG).show();
         }if(re1.equals("nicFail")){
             Toast.makeText(getApplicationContext(),"duplicated Nicname",Toast.LENGTH_LONG).show();
         }if(re1.equals("joinfail")){

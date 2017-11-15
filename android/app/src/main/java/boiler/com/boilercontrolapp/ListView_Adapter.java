@@ -295,7 +295,7 @@ public class ListView_Adapter extends BaseAdapter {
                     notifyDataSetChanged();
 
                     if (((ListView_item) getItem(position)).getHeatingPower()== 1 &&((ListView_item) getItem(position)).getCurrentTemp() < count){
-                        Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
                         ((ListView_item) getItem(position)).setIcon(R.drawable.wariming);
                         notifyDataSetChanged();
                     }
@@ -324,7 +324,7 @@ public class ListView_Adapter extends BaseAdapter {
                     notifyDataSetChanged();
 
                     if (((ListView_item) getItem(position)).getHeatingPower() == 1 && ((ListView_item) getItem(position)).getCurrentTemp() >= count){
-                        Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
+//                        Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                         ((ListView_item) getItem(position)).setIcon(0);
                         notifyDataSetChanged();
                     }

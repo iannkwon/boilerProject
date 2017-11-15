@@ -21,16 +21,14 @@ import java.net.URL;
 import java.net.URLEncoder;
 
 public class LoginActivity extends AppCompatActivity {
-    EditText et_apartcomplex;
-    EditText et_apartnumber;
+    EditText et_id;
     EditText et_pw;
 
     Button btn_member;
 
     LinearLayout layout1;
 
-    String apartComplex; // 동
-    String apartNumber; // 호수
+    String id;           // id
     String password;    // 비밀번호
 
     String link = "http://192.168.77.105:8090/BoilerControl/loginGo.do";
@@ -81,7 +79,7 @@ public class LoginActivity extends AppCompatActivity {
                 getInfo(); // 로그인 정보 가져오기
 
                 // 내용이 빈값일 때 저장 못하게 하기
-                if (apartComplex.equals("") || apartNumber.equals("")){
+                if (id.equals("") || password.equals("")){
                     Toast.makeText(getApplicationContext(),"내용을 넣어주세요.", Toast.LENGTH_SHORT).show();
                 }else{
                     sendInfo();     // 서버에 로그인 정보 보내기
@@ -92,12 +90,10 @@ public class LoginActivity extends AppCompatActivity {
 
     // 로그인 정보 가져오기 (동,호수,패스워드)
     private void getInfo(){
-        et_apartcomplex = (EditText)findViewById(R.id.et_apartcomplex);
-        et_apartnumber = (EditText)findViewById(R.id.et_apartnumer);
+        et_id = (EditText)findViewById(R.id.et_id);
         et_pw = (EditText)findViewById(R.id.et_pw);
 
-        apartComplex = et_apartcomplex.getText().toString();
-        apartNumber = et_apartnumber.getText().toString();
+        id = et_id.getText().toString();
         password = et_pw.getText().toString();
     }
 
@@ -115,12 +111,10 @@ public class LoginActivity extends AppCompatActivity {
             protected String doInBackground(String... params) {
                 try {
                     String link2 = params[0];        // 접속 주소
-                    String apartComlex2 = params[1]; // 아파트 동
-                    String apartNumber2 = params[2]; // 아파트 호수
-                    String password2 = params[3];    // 비밀번호
+                    String id2 = params[1]; // 아파트 동
+                    String password2 = params[2];    // 비밀번호
 
-                    String data1 = "apartComplex="+ URLEncoder.encode(apartComlex2, "UTF-8");
-                    data1 += "&apartNumber="+ URLEncoder.encode(apartNumber2, "UTF-8");
+                    String data1 = "id="+ URLEncoder.encode(id2, "UTF-8");
                     data1 += "&password="+ URLEncoder.encode(password2, "UTF-8");
                     URL url = new URL(link2);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -157,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         } // end SendLogData
         SendLogData sld = new SendLogData();
-        sld.execute(link,apartComplex,apartNumber,password);
+        sld.execute(link,id,password);
     } // end sendInfo
 
     // 확인후 결과
