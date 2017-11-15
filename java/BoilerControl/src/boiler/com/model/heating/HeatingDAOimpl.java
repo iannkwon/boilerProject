@@ -324,6 +324,40 @@ public class HeatingDAOimpl implements HeatingDAO {
 		}
 		return flag;
 	}
+	
+	@Override
+	public int updateName(HeatingVO vo) {
+		System.out.println("update Name ");
+		System.out.println(vo.getRoomName());
+		System.out.println(vo.getSerialNum());
+		int flag = 0;
+		try {
+			conn = DriverManager.getConnection(url, user, password);
+			String SQL_HEATING_UPDATENAME = "update heating set roomname=? where serialnum=?";
+			pstmt = conn.prepareStatement(SQL_HEATING_UPDATENAME);
+			pstmt.setString(1, vo.getRoomName());
+			pstmt.setString(2, vo.getSerialNum());
+			flag = pstmt.executeUpdate();
+		}catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if (pstmt != null ) {
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (conn != null) {
+				try {
+					conn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		return flag;
+	}
 
 	
 

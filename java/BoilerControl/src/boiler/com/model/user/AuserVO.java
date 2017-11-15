@@ -2,8 +2,7 @@ package boiler.com.model.user;
 
 public class AuserVO {
 	private int unum;
-	private int apartComplex;		// 아파트 단지
-	private int apartNumber;		// 아파트 호수
+	private String id;
 	private String password;		// 비밀번호
 	private String nicname;
 	private String joinDate;		// 로그인 시간
@@ -13,17 +12,12 @@ public class AuserVO {
 	public void setUnum(int unum) {
 		this.unum = unum;
 	}
-	public int getApartComplex() {
-		return apartComplex;
+
+	public String getId() {
+		return id;
 	}
-	public void setApartComplex(int apartComplex) {
-		this.apartComplex = apartComplex;
-	}
-	public int getApartNumber() {
-		return apartNumber;
-	}
-	public void setApartNumber(int apartNumber) {
-		this.apartNumber = apartNumber;
+	public void setId(String id) {
+		this.id = id;
 	}
 	public String getPassword() {
 		return password;

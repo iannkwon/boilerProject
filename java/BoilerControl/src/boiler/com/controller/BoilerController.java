@@ -23,9 +23,9 @@ import boiler.com.model.user.AuserVO;
 /**
  * Servlet implementation class BoilerController
  */
-@WebServlet({"/heatingSearch.do","/heatingInfo.do","/loginGo.do"
+@WebServlet({"/heatingInfo.do","/heatingSearch.do","/loginGo.do"
 	,"/heatingInsert.do","/heatingUpdate.do","/heatingControllerUpdate.do"
-	,"/heatingDelete.do","/memberGo.do"})
+	,"/heatingDelete.do","/memberGo.do","/updateName.do"})
 public class BoilerController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
@@ -61,6 +61,7 @@ public class BoilerController extends HttpServlet {
 		response.setCharacterEncoding("utf-8");
         PrintWriter out = response.getWriter();
         
+        	//온도 입력
         if (request.getServletPath().equals("/heatingInsert.do")) {
         	System.out.println("Servlet boilerInsert.do...");
         	
@@ -104,7 +105,7 @@ public class BoilerController extends HttpServlet {
         		
 			}
         	
-			
+			// 온도 정보
 		}else if (request.getServletPath().equals("/heatingInfo.do")) {
 			//String heatingTime = request.getParameter("heatingTime");
 			
@@ -134,37 +135,39 @@ public class BoilerController extends HttpServlet {
 			object.put("roomName", vo2.getRoomName());
 			out.append(object.toString());
 			
+			//로그인
 		}else if (request.getServletPath().equals("/loginGo.do")) {
-			String apartComplex = request.getParameter("apartComplex");
-			String apartNumber = request.getParameter("apartNumber");
+//			String apartComplex = request.getParameter("apartComplex");
+//			String apartNumber = request.getParameter("apartNumber");
+			String id = request.getParameter("id");
 			String password = request.getParameter("password");
 			
 			
-			System.out.println(apartComplex);
-			System.out.println(apartNumber);
+			System.out.println(id);
 			System.out.println(password);
 			
-			if (!apartComplex.equals("") && !apartNumber.equals("") &&
-					!password.equals("")){
+			if (!id.equals("") && !password.equals("")){
 				
 			AuserVO vo = new AuserVO();
 			AuserDAO dao = new AuserDAOimpl();
 			
-			vo.setApartComplex(Integer.parseInt((apartComplex)));
-			vo.setApartNumber(Integer.parseInt(apartNumber));
+//			vo.setApartComplex(Integer.parseInt((apartComplex)));
+//			vo.setApartNumber(Integer.parseInt(apartNumber));
+			vo.setId(id);
 			vo.setPassword(password);
 			
-			System.out.println(vo.getApartComplex());
+			System.out.println(vo.getId());
 			
 			AuserVO vo2 = dao.loginSearch(vo);
 			
-			System.out.println("vo2.getApartNum : "+vo2.getApartNumber());
-			if (vo2.getApartNumber()==0) {
+			System.out.println("vo2.getID : "+vo2.getId());
+			if (vo2.getId()=="fail") {
 				out.append("fail");
 			}else{
 				JSONObject jobj = new JSONObject();
-				jobj.put("apartComplext", vo2.getApartComplex());
-				jobj.put("apartNumber", vo2.getApartNumber());
+//				jobj.put("apartComplext", vo2.getApartComplex());
+//				jobj.put("apartNumber", vo2.getApartNumber());
+				jobj.put("id", vo2.getId());
 				jobj.put("nicName", vo2.getNicname());
 				
 				out.append(jobj.toString());
@@ -177,36 +180,35 @@ public class BoilerController extends HttpServlet {
 			
 			
 			
-			
+			//회원가입
 		} else if(request.getServletPath().equals("/memberGo.do")){
-			String apartComplex = request.getParameter("apartComplex");
-			String apartNumber = request.getParameter("apartNumber");
+//			String apartComplex = request.getParameter("apartComplex");
+//			String apartNumber = request.getParameter("apartNumber");
+			String id = request.getParameter("id");
 			String password = request.getParameter("password");
 			String nicName = request.getParameter("nicName");
 			String joinDate = request.getParameter("joinDate");
 			
-			System.out.println("Android >> java ApartComplex :"+apartComplex);
-			System.out.println("Android >> java ApartNumber :"+apartNumber);
+			System.out.println("Android >> java id :"+id);
 			System.out.println("Android >> java Password :"+password);
 			System.out.println("Android >> java Nicname :"+nicName);
 			System.out.println("Android >> java Joindate :"+joinDate);
 			
-			if (!apartComplex.equals("") && !apartNumber.equals("") && !nicName.equals("") &&
+			if (!id.equals("")  && !nicName.equals("") &&
 					!password.equals("") && !joinDate.equals("")) {
 				AuserVO vo = new AuserVO();
 				AuserDAO dao = new AuserDAOimpl();
 				
-				vo.setApartComplex(Integer.parseInt(apartComplex));
-				vo.setApartNumber(Integer.parseInt(apartNumber));
+				vo.setId(id);
 				vo.setPassword(password);
 				vo.setNicname(nicName);
 				vo.setJoinDate(joinDate);
-				int result1 = dao.loginApartCheck(vo);
+				int result1 = dao.loginIdCheck(vo);
 				int result2 = dao.loginNicCheck(vo);
 				System.out.println("result1"+result1);
 				System.out.println("result2"+result2);
 				if (result1 == 1) {
-					out.append("apartFail");
+					out.append("idFail");
 				}if (result2 ==1) {
 					out.append("nicFail");
 				}else if (result1 == 0 && result2 ==0) {
@@ -260,8 +262,8 @@ public class BoilerController extends HttpServlet {
         		
         		System.out.println("heatingPower DB->"+Integer.parseInt(heatingPower));
         		System.out.println("outGoingMode DB->"+Integer.parseInt(outGoingMode));
-        		System.out.println("currentTemp DB->"+Integer.parseInt(currentTemp));
-        		System.out.println("desiredTemp DB->"+Integer.parseInt(desiredTemp));
+        		System.out.println("currentTemp DB->"+Double.parseDouble(currentTemp));
+        		System.out.println("desiredTemp DB->"+Double.parseDouble(desiredTemp));
         		System.out.println("heatingTime DB->"+heatingTime);
         		System.out.println("serialNum DB->"+serialNum);
         		System.out.println("roomName DB->"+roomName);
@@ -364,6 +366,30 @@ public class BoilerController extends HttpServlet {
 				System.out.println("heatingDelete Successed");
 			} else {
 				System.out.println("heatingDelete Failed");
+			}
+		}
+		
+	
+	}else if (request.getServletPath().equals("/updateName.do")) {
+		String serialNum = request.getParameter("serialNum");
+		String roomName = request.getParameter("roomName");
+			
+		System.out.println(serialNum);
+		System.out.println(roomName);
+		
+		if (!serialNum.equals("") && !roomName.equals("") ) {
+			HeatingVO vo = new HeatingVO();
+    		HeatingDAO dao = new HeatingDAOimpl();
+    		
+    		vo.setSerialNum(serialNum);
+    		vo.setRoomName(roomName);
+    		
+    		int result = dao.updateName(vo);
+    		
+    		if (result == 1) {
+				System.out.println("updateName Successed");
+			} else {
+				System.out.println("updateName Failed");
 			}
 		}
 		

@@ -6,7 +6,7 @@ public interface AuserDAO {
 	
 	public AuserVO loginSearch(AuserVO vo);
 	
-	public int loginApartCheck(AuserVO vo);
+	public int loginIdCheck(AuserVO vo);
 	
 	public int loginNicCheck(AuserVO vo);
 

@@ -17,8 +17,9 @@ public interface HeatingDAO {
 	
 	public int serialNumCheck(HeatingVO vo);
 	
-	public HeatingVO searchInfo(HeatingVO vo);
+	public int updateName(HeatingVO vo);
 	
+	public HeatingVO searchInfo(HeatingVO vo);
 	
 	public ArrayList<HeatingVO> searchList(HeatingVO vo);
 }

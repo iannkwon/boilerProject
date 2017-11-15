@@ -31,19 +31,21 @@ public class AuserDAOimpl implements AuserDAO {
 	}
 	@Override
 	public int insert(AuserVO vo) {
-		// TODO Auto-generated method stub
+		System.out.println("insert ID>>>"+vo.getId());
+		System.out.println("insert password>>>"+vo.getPassword());
+		System.out.println("insert nicname>>>"+vo.getNicname());
+		System.out.println("insert joindate>>>"+vo.getJoinDate());
 		int flag=0;
 		
 		try {
 			conn = DriverManager.getConnection(url, user, password);
-			String SQL_AUSER_INSERT = "insert into auser(unum, apartcomplex, apartnumber,password,nicname,joindate)"
-					+ "values(seq_auser_num.nextval,?,?,?,?,?)";
+			String SQL_AUSER_INSERT = "insert into auser(unum, id, password, nicname, joindate)"
+					+ "values(seq_auser_num.nextval,?,?,?,?)";
 			pstmt = conn.prepareStatement(SQL_AUSER_INSERT);
-			pstmt.setInt(1, vo.getApartComplex());
-			pstmt.setInt(2, vo.getApartNumber());
-			pstmt.setString(3, vo.getPassword());
-			pstmt.setString(4, vo.getNicname());
-			pstmt.setString(5, vo.getJoinDate());
+			pstmt.setString(1, vo.getId());
+			pstmt.setString(2, vo.getPassword());
+			pstmt.setString(3, vo.getNicname());
+			pstmt.setString(4, vo.getJoinDate());
 			
 			flag = pstmt.executeUpdate();
 			
@@ -77,11 +79,10 @@ public AuserVO loginSearch(AuserVO vo) {
 	try {
 		conn = DriverManager.getConnection(url, user, password);
 		String SQL_AUSER_LOGIN = "select nicname from auser "
-				+ "where apartcomplex=? and apartnumber=? and password=?";
+				+ "where id = ? and password=?";
 		pstmt = conn.prepareStatement(SQL_AUSER_LOGIN);
-		pstmt.setInt(1, vo.getApartComplex());
-		pstmt.setInt(2, vo.getApartNumber());
-		pstmt.setString(3, vo.getPassword());
+		pstmt.setString(1, vo.getId());
+		pstmt.setString(2, vo.getPassword());
 		
 		rs = pstmt.executeQuery();
 		while(rs.next()){
@@ -89,16 +90,14 @@ public AuserVO loginSearch(AuserVO vo) {
 		}
 		
 		if (!nic.equals("")) {
-			vo2.setApartComplex(vo.getApartComplex());
-			vo2.setApartNumber(vo.getApartNumber());
+			vo2.setId(vo.getId());
 			vo2.setNicname(nic);
 		}else{
-			vo2.setApartNumber(0);
+			vo2.setId("fail");
 		}
 		
 		
-		System.out.println(vo2.getApartComplex());
-		System.out.println(vo2.getApartNumber());
+		System.out.println(vo2.getId());
 		System.out.println(vo2.getPassword());
 		System.out.println(nic);
 		
@@ -124,16 +123,15 @@ public AuserVO loginSearch(AuserVO vo) {
 	}
 
 @Override
-public int loginApartCheck(AuserVO vo) {
+public int loginIdCheck(AuserVO vo) {
 	int flag=0;
 	System.out.println("loginApartCheck");
 	try {
 		conn = DriverManager.getConnection(url, user, password);
-		String SQL_AUSER_APARTCHECK = "select count(*) as userok from auser where apartcomplex=? and apartnumber=?";
+		String SQL_AUSER_APARTCHECK = "select count(*) as userok from auser where id =? ";
 		pstmt = conn.prepareStatement(SQL_AUSER_APARTCHECK);
 		
-		pstmt.setInt(1, vo.getApartComplex());
-		pstmt.setInt(2, vo.getApartNumber());
+		pstmt.setString(1, vo.getId());
 		
 		rs = pstmt.executeQuery();
 		while(rs.next()){
