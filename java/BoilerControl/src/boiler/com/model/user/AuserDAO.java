@@ -9,6 +9,8 @@ public interface AuserDAO {
 	public int loginIdCheck(AuserVO vo);
 	
 	public int loginNicCheck(AuserVO vo);
+	
+	public int serialCheck(AuserVO vo);
 
 	
 }

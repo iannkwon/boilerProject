@@ -21,16 +21,16 @@ public class AuserMain {
 //		}
 		
 		// login search
-		vo.setApartComplex(101);
-		vo.setApartNumber(201);
-		vo.setPassword("123456");
-		
-		AuserVO vo2 = dao.loginSearch(vo);
-		
-		
-		System.out.println("MAIN ->"+vo2.getApartComplex());
-		System.out.println("MAIN ->"+vo2.getApartNumber());
-		System.out.println("MAIN ->"+vo2.getNicname());
+//		vo.setApartComplex(101);
+//		vo.setApartNumber(201);
+//		vo.setPassword("123456");
+//		
+//		AuserVO vo2 = dao.loginSearch(vo);
+//		
+//		
+//		System.out.println("MAIN ->"+vo2.getApartComplex());
+//		System.out.println("MAIN ->"+vo2.getApartNumber());
+//		System.out.println("MAIN ->"+vo2.getNicname());
 	}
 
 }

@@ -39,18 +39,20 @@ public class AuserDAOimpl implements AuserDAO {
 		
 		try {
 			conn = DriverManager.getConnection(url, user, password);
-			String SQL_AUSER_INSERT = "insert into auser(unum, id, password, nicname, joindate)"
-					+ "values(seq_auser_num.nextval,?,?,?,?)";
+//			String SQL_AUSER_INSERT = "insert into auser(unum, id, password, nicname, joindate)"
+//					+ "values(seq_auser_num.nextval,?,?,?,?)";
+			
+			String SQL_AUSER_INSERT = "update auser set id=?, password=?, nicname=?, joindate=? where serialnum=?";
 			pstmt = conn.prepareStatement(SQL_AUSER_INSERT);
 			pstmt.setString(1, vo.getId());
 			pstmt.setString(2, vo.getPassword());
 			pstmt.setString(3, vo.getNicname());
 			pstmt.setString(4, vo.getJoinDate());
+			pstmt.setString(5, vo.getSerialNum());
 			
 			flag = pstmt.executeUpdate();
 			
 		} catch (SQLException e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		} finally {
 			if (pstmt != null ) {
@@ -125,11 +127,11 @@ public AuserVO loginSearch(AuserVO vo) {
 @Override
 public int loginIdCheck(AuserVO vo) {
 	int flag=0;
-	System.out.println("loginApartCheck");
+	System.out.println("loginIdCheck");
 	try {
 		conn = DriverManager.getConnection(url, user, password);
-		String SQL_AUSER_APARTCHECK = "select count(*) as userok from auser where id =? ";
-		pstmt = conn.prepareStatement(SQL_AUSER_APARTCHECK);
+		String SQL_AUSER_IDCHECK = "select count(*) as userok from auser where id =? ";
+		pstmt = conn.prepareStatement(SQL_AUSER_IDCHECK);
 		
 		pstmt.setString(1, vo.getId());
 		
@@ -161,6 +163,7 @@ public int loginIdCheck(AuserVO vo) {
 	
 	return flag;
 }
+
 
 @Override
 public int loginNicCheck(AuserVO vo) {
@@ -201,5 +204,45 @@ public int loginNicCheck(AuserVO vo) {
 	
 	return flag;
 }
+
+@Override
+public int serialCheck(AuserVO vo) {
+	int flag=0;
+	String id="";
+	System.out.println("serialNumCheck");
+	try {
+		conn = DriverManager.getConnection(url, user, password);
+		String SQL_AUSER_SERIALCHECK = "select count(*) as serialok from auser where serialnum =?";
+		pstmt = conn.prepareStatement(SQL_AUSER_SERIALCHECK);
+		
+		pstmt.setString(1, vo.getSerialNum());
+		
+		rs = pstmt.executeQuery();
+		while(rs.next()){
+			flag = rs.getInt("serialok");
+		}
+		
+	} catch (SQLException e) {
+		e.printStackTrace();
+	} finally {
+		if (pstmt != null ) {
+			try {
+				pstmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		if (conn != null) {
+			try {
+				conn.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	return flag;
+}
+
 
 }
