@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,12 +41,12 @@ String joinDate;
 String serialNum;
 
 String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
+//String link = "https://deo.homedns.tv:8090/BoilerControl/memberGo.do";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_member);
-
+                setContentView(R.layout.activity_member);
 
         btn_ok = (Button)findViewById(R.id.btn_ok);
 
@@ -57,6 +58,8 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
     }
 
     private void clickHide(){
+        // 텍스트 클릭시 화면 올리기
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         layout2 = (LinearLayout)findViewById(R.id.layout2);
         layout2.setOnClickListener(new View.OnClickListener() {
             @Override

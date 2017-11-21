@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
     String password;    // 비밀번호
 
     String link = "http://192.168.77.105:8090/BoilerControl/loginGo.do";
+//    String link = "https://deo.homedns.tv:8090/BoilerControl/loginGo.do";
 
 
     @Override
@@ -45,10 +47,14 @@ public class LoginActivity extends AppCompatActivity {
         memberGO();        // 회원가입
 
         clickHide();        // 에디텍스트 이외 클릭 키보드 숨기기
+
+
     }
 
     // 클릭 키보드 숨김
     private void clickHide(){
+        // 텍스트 클릭시 화면 올리기
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         layout1 = (LinearLayout)findViewById(R.id.layout1);
         layout1.setOnClickListener(new View.OnClickListener() {
             @Override

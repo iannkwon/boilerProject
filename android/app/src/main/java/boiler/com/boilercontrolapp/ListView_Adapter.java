@@ -69,7 +69,8 @@ public class ListView_Adapter extends BaseAdapter {
     double count;
 
     String link = "http://192.168.77.105:8090/BoilerControl/heatingUpdate.do"; // 데이터 보내는 주소
-    String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; // 삭제
+//    String link = "https://deo.homedns.tv:8090/BoilerControl/heatingUpdate.do"; // 데이터 보내는 주소
+
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값

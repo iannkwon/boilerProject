@@ -65,7 +65,14 @@ public class MainActivity extends AppCompatActivity {
     String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingSearch.do"; // 받는 주소
     String link_3 = "http://192.168.77.105:8090/BoilerControl/heatingInsert.do"; // 방 추가
     String link_4 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; //삭제
-    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //방 이름 변경
+    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //방 이름 변경//
+
+//    String link = "https://deo.homedns.tv:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+//    String link_2 = "https://deo.homedns.tv5:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+//    String link_3 = "https://deo.homedns.tv:8090/BoilerControl/heatingInsert.do"; // 방 추가
+//    String link_4 = "https://deo.homedns.tv:8090/BoilerControl/heatingDelete.do"; //삭제
+//    String link_5 = "https://deo.homedns.tv:8090/BoilerControl/updateName.do"; //방 이름 변경
+
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
@@ -220,8 +227,14 @@ public class MainActivity extends AppCompatActivity {
                                 roomName = add_roomName.getText().toString();
                                 if ( !serialNum.equals("") && !roomName.equals("")) {
 //                                    Toast.makeText(getApplicationContext(), "Add Room", Toast.LENGTH_SHORT).show();
-                                    // 제품 추가
-                                    addRoomSend();
+                                    if (dataLength < 7){
+                                        // 제품 추가
+                                        addRoomSend();
+                                        Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), "Over Room, You can register up to 7 room", Toast.LENGTH_SHORT).show();
+                                    }
+
 
                                 } else {
                                     Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
