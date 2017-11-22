@@ -12,6 +12,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -31,6 +32,7 @@ EditText et_passwordOk;
 EditText et_serialNum;
 
 LinearLayout layout2;
+RelativeLayout Rlayout;
 Button btn_ok;
 
 String id;
@@ -59,13 +61,22 @@ String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
 
     private void clickHide(){
         // 텍스트 클릭시 화면 올리기
-        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        layout2 = (LinearLayout)findViewById(R.id.layout2);
-        layout2.setOnClickListener(new View.OnClickListener() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+//        layout2 = (LinearLayout)findViewById(R.id.layout2);
+//        layout2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+//                imm.hideSoftInputFromWindow(layout2.getWindowToken(), 0);
+//            }
+//        });
+
+        Rlayout = (RelativeLayout)findViewById(R.id.Rlayout);
+        Rlayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-                imm.hideSoftInputFromWindow(layout2.getWindowToken(), 0);
+                imm.hideSoftInputFromWindow(Rlayout.getWindowToken(), 0);
             }
         });
     }
