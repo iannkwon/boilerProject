@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -61,17 +62,23 @@ public class MainActivity extends AppCompatActivity {
     double count;
     int dataLength;
 
-    String link = "http://192.168.77.105:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
-    String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingSearch.do"; // 받는 주소
-    String link_3 = "http://192.168.77.105:8090/BoilerControl/heatingInsert.do"; // 방 추가
-    String link_4 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; //삭제
-    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //방 이름 변경//
+//    String link = "http://192.168.77.105:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+//    String link_2 = "http://192.168.77.105:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+//    String link_3 = "http://192.168.77.105:8090/BoilerControl/heatingInsert.do"; // 방 추가
+//    String link_4 = "http://192.168.77.105:8090/BoilerControl/heatingDelete.do"; //삭제
+//    String link_5 = "http://192.168.77.105:8090/BoilerControl/updateName.do"; //방 이름 변경//
 
-//    String link = "https://deo.homedns.tv:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
-//    String link_2 = "https://deo.homedns.tv5:8090/BoilerControl/heatingSearch.do"; // 받는 주소
-//    String link_3 = "https://deo.homedns.tv:8090/BoilerControl/heatingInsert.do"; // 방 추가
-//    String link_4 = "https://deo.homedns.tv:8090/BoilerControl/heatingDelete.do"; //삭제
-//    String link_5 = "https://deo.homedns.tv:8090/BoilerControl/updateName.do"; //방 이름 변경
+//    String link = "http://deo.homedns.tv:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+//    String link_2 = "http://deo.homedns.tv:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+//    String link_3 = "http://deo.homedns.tv:8090/BoilerControl/heatingInsert.do"; // 방 추가
+//    String link_4 = "http://deo.homedns.tv:8090/BoilerControl/heatingDelete.do"; //삭제
+//    String link_5 = "http://deo.homedns.tv:8090/BoilerControl/updateName.do"; //방 이름 변경
+
+      String link = "http://192.168.10.100:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+    String link_2 = "http://192.168.10.100:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+    String link_3 = "http://192.168.10.100:8090/BoilerControl/heatingInsert.do"; // 방 추가
+    String link_4 = "http://192.168.10.100:8090/BoilerControl/heatingDelete.do"; //삭제
+    String link_5 = "http://192.168.10.100:8090/BoilerControl/updateName.do"; //방 이름 변경
 
     String heatingPower;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
@@ -207,51 +214,54 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
-                // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
-                Context context = getApplicationContext();
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                // 레이아웃 설정
-                View layout = inflater.inflate(R.layout.add_layout,
-                        (ViewGroup) findViewById(R.id.layout_add));
-                final EditText add_serialNum = (EditText) layout.findViewById(R.id.add_serialNum);
-                final EditText add_roomName = (EditText) layout.findViewById(R.id.add_roomName);
-                ab.setTitle("Add Room");
-                ab.setView(layout);
-                ab.setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
+//                        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+                        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme);
+                        // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
+                        Context context = getApplicationContext();
+                        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                        // 레이아웃 설정
+                        View layout = inflater.inflate(R.layout.add_layout,
+                                (ViewGroup) findViewById(R.id.layout_add));
+                        final EditText add_serialNum = (EditText) layout.findViewById(R.id.add_serialNum);
+                        final EditText add_roomName = (EditText) layout.findViewById(R.id.add_roomName);
+                        ab.setTitle("Add Room");
+                        ab.setView(layout);
 
-                                serialNum = add_serialNum.getText().toString();
-                                roomName = add_roomName.getText().toString();
-                                if ( !serialNum.equals("") && !roomName.equals("")) {
-//                                    Toast.makeText(getApplicationContext(), "Add Room", Toast.LENGTH_SHORT).show();
-                                    if (dataLength < 7){
-                                        // 제품 추가
-                                        addRoomSend();
-                                        Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
-                                    }else{
-                                        Toast.makeText(getApplicationContext(), "Over Room, You can register up to 7 room", Toast.LENGTH_SHORT).show();
+                        ab.setPositiveButton("OK",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                        serialNum = add_serialNum.getText().toString();
+                                        roomName = add_roomName.getText().toString();
+                                        if ( !serialNum.equals("") && !roomName.equals("")) {
+        //                                    Toast.makeText(getApplicationContext(), "Add Room", Toast.LENGTH_SHORT).show();
+                                            if (dataLength < 7){
+                                                // 제품 추가
+                                                addRoomSend();
+                                                Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
+                                            }else{
+                                                Toast.makeText(getApplicationContext(), "Over Room, You can register up to 7 room", Toast.LENGTH_SHORT).show();
+                                            }
+
+
+                                        } else {
+                                            Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
+                                        }
+                                        // 새로고침
+                                        getHeatingInfo();
                                     }
+                                });
+                        ab.setNegativeButton("CANCEL",
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        dialogInterface.cancel();
+                                    }
+                                });
 
 
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
-                                }
-                                // 새로고침
-                                getHeatingInfo();
-                            }
-                        });
-                ab.setNegativeButton("CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-
-                            }
-                        });
-                ab.show();
-
+                        ab.show();
             }
 
         });
@@ -464,6 +474,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("SerialNum",serialNum);
                 final String[] abList = {"Modify","Delete"};
                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+//               AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                ab.setItems(abList, new DialogInterface.OnClickListener() {
                            @Override
                            public void onClick(DialogInterface dialogInterface, int i) {
@@ -472,7 +483,8 @@ public class MainActivity extends AppCompatActivity {
                                    case "Modify":
                                        final EditText nameUpdate = new EditText(MainActivity.this);
 
-                                       AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this);
+//                                       AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this);
+                                       AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                                        abMod.setTitle("Room Name Modify");
                                        abMod.setView(nameUpdate);
                                        abMod.setPositiveButton("modify", new DialogInterface.OnClickListener() {
@@ -496,7 +508,8 @@ public class MainActivity extends AppCompatActivity {
                                        break;
 
                                    case "Delete":
-                                       AlertDialog.Builder abDel = new AlertDialog.Builder(MainActivity.this);
+//                                       AlertDialog.Builder abDel = new AlertDialog.Builder(MainActivity.this);
+                                       AlertDialog.Builder abDel = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                                        abDel.setTitle("Delete");
                                        abDel.setMessage("Are you really remove your room?");
                                        abDel.setPositiveButton("Delete", new DialogInterface.OnClickListener() {

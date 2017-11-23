@@ -42,8 +42,9 @@ String passwordOk;
 String joinDate;
 String serialNum;
 
-String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
-//String link = "https://deo.homedns.tv:8090/BoilerControl/memberGo.do";
+//String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
+//String link = "http://deo.homedns.tv:8090/BoilerControl/memberGo.do";
+String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

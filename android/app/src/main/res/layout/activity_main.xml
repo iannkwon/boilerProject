@@ -126,8 +126,9 @@
             android:layout_toRightOf="@+id/btn_save"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            android:text="All Control"
+            android:text="Controller"
             android:textAlignment="center"
+            android:textSize="10dp"
 
             android:textColor="#F0F0E6"/>
 
@@ -154,6 +155,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:text=""
+            android:textSize="15dp"
             android:textColor="#F0F0E6"/>
 
     </RelativeLayout>
