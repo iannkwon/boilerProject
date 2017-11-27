@@ -1,8 +1,5 @@
 package boiler.com.boilercontrolapp;
 
-import android.graphics.drawable.Drawable;
-import android.widget.ImageView;
-
 /**
  * Created by Owner on 2017-10-31.
  */

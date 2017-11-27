@@ -1,46 +1,28 @@
 package boiler.com.boilercontrolapp;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.FragmentManager;
-import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Array;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by Owner on 2017-10-31.
@@ -165,8 +147,7 @@ public class ListView_Adapter extends BaseAdapter {
                     iv_warm.setImageResource(R.drawable.wariming);
                     notifyDataSetChanged();
                 }
-            }
-            if (((ListView_item) getItem(position)).getHeatingPower() == 0 ) {
+            } else {
                 sw_heatingPower.setChecked(false);
                 notifyDataSetChanged();
                 if (((ListView_item) getItem(position)).getOutgoingMode() == 0 ) {
@@ -177,7 +158,7 @@ public class ListView_Adapter extends BaseAdapter {
                     notifyDataSetChanged();
                 }
             }
-
+            // 외출 스위치
             if (((ListView_item) getItem(position)).getOutgoingMode() == 1 ){
                 sw_outgoingMode.setChecked(true);
                 tv_desiredTemp.setVisibility(View.VISIBLE);
@@ -185,10 +166,7 @@ public class ListView_Adapter extends BaseAdapter {
                 tv_desired.setVisibility(View.VISIBLE);
                 iv_warm.setImageResource(R.drawable.goingout);
                 notifyDataSetChanged();
-            }
-
-//            // 외출 스위치
-            if (((ListView_item) getItem(position)).getOutgoingMode() == 0  ) {
+            } else {
                 sw_outgoingMode.setChecked(false);
                 notifyDataSetChanged();
                 if (((ListView_item) getItem(position)).getHeatingPower() == 0 ) {
@@ -205,11 +183,12 @@ public class ListView_Adapter extends BaseAdapter {
 
 
         }
+
         // 난방 전원 스위치
-        sw_heatingPower.setOnClickListener(new View.OnClickListener() {
+        sw_heatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-                if (((ListView_item) getItem(position)).getHeatingPower() == 0  ){
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if ( b ){
                     Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setHeatingPower(1);
                     ((ListView_item) getItem(position)).getDesiredTemp();
@@ -225,16 +204,13 @@ public class ListView_Adapter extends BaseAdapter {
                         ((ListView_item) getItem(position)).setIcon(0);
                         notifyDataSetChanged();
                     }
-//
+
                     Log.i("heatingSW value1",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
                     Log.i("outgoing value1",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
                 }
-                else{
+                else {
                     Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setHeatingPower(0);
-                    tv_desiredTemp.setVisibility(View.INVISIBLE);
-                    tv_desiredTempText.setVisibility(View.INVISIBLE);
-                    tv_desired.setVisibility(View.INVISIBLE);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
                     Log.i("heatingSW value2",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
@@ -243,13 +219,11 @@ public class ListView_Adapter extends BaseAdapter {
             }
         });
 
-
         // 외출 모드 스위치
-        sw_outgoingMode.setOnClickListener(new View.OnClickListener() {
+        sw_outgoingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
-
-                if (((ListView_item) getItem(position)).getOutgoingMode()==0 ){
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if ( b ){
                     Toast.makeText(mContext, "outgoingMode ON",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOutgoingMode(1);
                     ((ListView_item) getItem(position)).getDesiredTemp();
@@ -261,26 +235,24 @@ public class ListView_Adapter extends BaseAdapter {
                     tv_desired.setVisibility(View.VISIBLE);
                     ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
                     notifyDataSetChanged();
-                    Log.i("heatingSW value1",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value1",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
                     if ( ((ListView_item) getItem(position)).getHeatingPower() == 1 ){
                         ((ListView_item) getItem(position)).setHeatingPower(0);
                         notifyDataSetChanged();
                     }
+                    Log.i("heatingSW value3",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
+                    Log.i("outgoing value3",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
                 }
                 else {
                     Toast.makeText(mContext, "outgoingMode OFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOutgoingMode(0);
-                    tv_desiredTemp.setVisibility(View.INVISIBLE);
-                    tv_desiredTempText.setVisibility(View.INVISIBLE);
-                    tv_desired.setVisibility(View.INVISIBLE);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
-                    Log.i("heatingSW value2",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value2",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
+                    Log.i("heatingSW value4",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
+                    Log.i("outgoing value4",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
                 }
             }
         });
+
         count = ((ListView_item) getItem(position)).getDesiredTemp();
         // 각 아이템 상승 버튼 클릭
         btn_up.setOnClickListener(new View.OnClickListener() {

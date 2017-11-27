@@ -4,17 +4,16 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -33,9 +32,7 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -89,12 +86,12 @@ public class MainActivity extends AppCompatActivity {
     String roomName;        // 방 이름
     String nicName;
 
-    String[] heatingPower2 = new String[7];
-    String[] outGoingMode2 = new String[7];    // 외출 모드 값
-    String[] currentTemp2 = new String[7];     // 현재 온도 값
-    String[] desiredTemp2 = new String[7];      // 희망 온도 값
-    String[] serialNum2 = new String[7];       // 제품 시리얼 번호
-    String[] roomName2 = new String[7];        // 방 이름
+    String[] heatingPower2 = new String[8];
+    String[] outGoingMode2 = new String[8];    // 외출 모드 값
+    String[] currentTemp2 = new String[8];     // 현재 온도 값
+    String[] desiredTemp2 = new String[8];      // 희망 온도 값
+    String[] serialNum2 = new String[8];       // 제품 시리얼 번호
+    String[] roomName2 = new String[8];        // 방 이름
 
     int desireAvg;
 
@@ -161,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
 
 
                 };
-                timer.schedule(timerTask, 1000, 30000);    // 30초 후부터 30초 마다
+                timer.schedule(timerTask, 1000, 60000);    // 30초 후부터 30초 마다
 
 
             }
@@ -215,7 +212,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
 //                        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
-                        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme);
+                        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                         // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
                         Context context = getApplicationContext();
                         LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -241,7 +238,7 @@ public class MainActivity extends AppCompatActivity {
                                                 addRoomSend();
                                                 Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
                                             }else{
-                                                Toast.makeText(getApplicationContext(), "Over Room, You can register up to 7 room", Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(getApplicationContext(), "Over Room, You can register up to 8 room", Toast.LENGTH_SHORT).show();
                                             }
 
 
@@ -537,7 +534,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
     }
 
     public void deleteDo(){
@@ -682,10 +678,10 @@ public class MainActivity extends AppCompatActivity {
     private void buttonSetting() {
         tv_desiredTemp.setVisibility(View.INVISIBLE);
         desiredTemp_text.setVisibility(View.INVISIBLE);
-        // 전체 난방
-        sw_allHeatingPower.setOnClickListener(new View.OnClickListener() {
+
+        sw_allHeatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if (sw_allHeatingPower.isChecked()){
                     sw_allHeatingPower.setChecked(true);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
@@ -711,9 +707,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        sw_allOutgoingMode.setOnClickListener(new View.OnClickListener() {
+        sw_allOutgoingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View view) {
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 // 전체 외출
                 if (sw_allOutgoingMode.isChecked()){
                     sw_allOutgoingMode.setChecked(true);
@@ -777,7 +773,7 @@ public class MainActivity extends AppCompatActivity {
         btn_save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new AlertDialog.Builder(MainActivity.this)
+                new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme)
                         .setTitle("All Control")
                         .setMessage("Are you All Control?")
                         .setCancelable(false)
@@ -956,7 +952,7 @@ public class MainActivity extends AppCompatActivity {
 
     //저장된 토큰값 출력
     private void showtoken(){
-        String aa=SessionNow.getSession(this,"token1");
+        String aa= SessionNow.getSession(this,"token1");
         Log.i("aa.toString():",aa.toString());
         //json값에서 닉네임값만 추출한다
         try {

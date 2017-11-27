@@ -11,7 +11,7 @@
     <RelativeLayout
         android:id="@+id/layout_main"
         android:layout_width="match_parent"
-        android:layout_height="90dp"
+        android:layout_height="wrap_content"
         android:background="#FC523D">
 
         <TextView
@@ -19,7 +19,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="All Heating"
-            android:layout_margin="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_margin="10dp"
             android:textColor="#F0F0E6"
             />
 
@@ -29,9 +30,12 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_allHeatingPower"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="5dp"
+            android:layout_marginTop="10dp"
             android:track="@drawable/switch_track_selector"
-            android:thumb="@drawable/switch_thumb_selector"/>
+            android:thumb="@drawable/switch_thumb_selector"
+            android:textOn=""
+            android:textOff=""
+            android:switchMinWidth="50dp"/>
 
 
         <TextView
@@ -40,7 +44,8 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_allHeatingPower"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
             android:text="All Outgoing"
             android:textColor="#F0F0E6"/>
 
@@ -50,17 +55,20 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_allOutgoingMode"
             android:layout_below="@+id/sw_allHeatingPower"
-            android:layout_marginLeft="6dp"
+            android:layout_marginLeft="13dp"
             android:layout_marginTop="10dp"
             android:track="@drawable/switch_track_selector"
-            android:thumb="@drawable/switch_thumb_selector"/>
+            android:thumb="@drawable/switch_thumb_selector"
+            android:textOn=""
+            android:textOff=""
+            android:switchMinWidth="50dp"/>
 
         <TextView
             android:id="@+id/desiredTemp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/sw_allHeatingPower"
-            android:layout_marginLeft="7dp"
+            android:layout_marginLeft="10dp"
             android:text="Setting"
             android:textColor="#F0F0E6"/>
 
@@ -83,7 +91,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tv_desiredTemp"
-            android:layout_marginLeft="148dp" />
+            android:layout_toRightOf="@+id/sw_allOutgoingMode"/>
 
         <Button
             android:id="@+id/btn_up"
@@ -126,7 +134,7 @@
             android:layout_toRightOf="@+id/btn_save"
             android:layout_centerVertical="true"
             android:layout_marginLeft="15dp"
-            android:text="Controller"
+            android:text=""
             android:textAlignment="center"
             android:textSize="10dp"
 

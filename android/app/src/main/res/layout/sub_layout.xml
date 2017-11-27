@@ -30,7 +30,12 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_HeatingPower"
             android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"/>
+            android:layout_marginTop="10dp"
+            android:track="@drawable/switch_track_selector"
+            android:thumb="@drawable/switch_thumb_selector"
+            android:textOn=""
+            android:textOff=""
+            android:switchMinWidth="50dp"/>
 
 
         <TextView
@@ -50,7 +55,12 @@
             android:layout_toRightOf="@+id/tv_OutgoingMode"
             android:layout_below="@+id/sw_HeatingPower"
             android:layout_marginLeft="3dp"
-            android:layout_marginTop="15dp"/>
+            android:layout_marginTop="15dp"
+            android:track="@drawable/switch_track_selector"
+            android:thumb="@drawable/switch_thumb_selector"
+            android:textOn=""
+            android:textOff=""
+            android:switchMinWidth="50dp"/>
 
         <TextView
             android:id="@+id/tv_Current"
@@ -59,7 +69,9 @@
             android:layout_toRightOf="@+id/sw_HeatingPower"
             android:layout_marginLeft="10dp"
             android:text="Current"
-            android:textColor="#B06457"/>
+            android:textColor="#B06457"
+            android:textOn=""
+            android:textOff=""/>
 
         <TextView
             android:id="@+id/tv_CurrentTemp"
@@ -120,7 +132,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tv_desiredTemp"
-            android:layout_marginLeft="230dp" />
+            android:layout_toRightOf="@+id/tv_CurrentD"/>
 
         <Button
             android:id="@+id/btn_up"
@@ -133,19 +145,16 @@
             android:text="▲"
             android:background="#F9C4A4"
             />
+
         <Button
             android:id="@+id/btn_down"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:layout_toRightOf="@+id/tv_desired"
-            android:layout_below="@+id/btn_up"
-            android:layout_marginBottom="10dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
-            android:textColor="#B06457"
-            android:text="▼"
+            android:layout_alignBottom="@+id/sw_OutgoingMode"
+            android:layout_toStartOf="@+id/btn_save"
             android:background="#F9C4A4"
-           />
+            android:text="▼"
+            android:textColor="#B06457" />
 
 
 
@@ -166,7 +175,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_CurrentTemp"
-            android:layout_marginLeft="120dp"
+            android:layout_toRightOf="@+id/sw_OutgoingMode"
             android:layout_centerVertical="true"
             android:text="Room1"
             android:textSize="20dp"
