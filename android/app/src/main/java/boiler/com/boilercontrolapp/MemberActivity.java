@@ -15,13 +15,26 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.Date;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class MemberActivity extends AppCompatActivity {
 
@@ -44,7 +57,8 @@ String serialNum;
 
 //String link = "http://192.168.77.105:8090/BoilerControl/memberGo.do";
 //String link = "http://deo.homedns.tv:8090/BoilerControl/memberGo.do";
-String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
+//String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
+String link = "https://dsrc.co.kr/user/signup";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +143,13 @@ String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
         serialNum = et_serialNum.getText().toString();      // 패스워드 확인
 
         Log.i("getInfo","ok");
+
+
+
+
+
+
+
     }
 
     // 정보 보내기
@@ -144,20 +165,41 @@ String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
             @Override
             protected String doInBackground(String... params) {
                 try {
+                    Log.i("insertGO","");
                     String link2 = params[0];            // 접속 주소
-                    String id2 = params[1];    // 아파트 동
-                    String  password2= params[2];         // 아파트 호수
-                    String  nicName2= params[3];        // 비밀번호
-                    String joinDate2 = params[4];        // 가입 시간
-                    String serialNum2 = params[5];        // 가입 시간
+                    String id2 = params[1];              // 아이디
+                    String  password2= params[2];        // 암호
+                    String  nicName2= params[3];        // 닉네임
+//                    String joinDate2 = params[4];        // 가입 시간
+//                    String serialNum2 = params[5];        // 가입 시간
 
-                    String data1 = "id="+ URLEncoder.encode(id2, "UTF-8");
+//                    String data1 = "id="+ URLEncoder.encode(id2, "UTF-8");
+
+//                    data1 += "&password="+URLEncoder.encode(password2, "UTF-8");
+//                    data1 += "&nicName="+URLEncoder.encode(nicName2, "UTF-8");
+//                    data1 += "&joinDate="+URLEncoder.encode(joinDate2, "UTF-8");
+//                    data1 += "&serialNum="+URLEncoder.encode(serialNum2, "UTF-8");
+                    String data1 = "username="+ URLEncoder.encode(id2, "UTF-8");
                     data1 += "&password="+URLEncoder.encode(password2, "UTF-8");
-                    data1 += "&nicName="+URLEncoder.encode(nicName2, "UTF-8");
-                    data1 += "&joinDate="+URLEncoder.encode(joinDate2, "UTF-8");
-                    data1 += "&serialNum="+URLEncoder.encode(serialNum2, "UTF-8");
+                    data1 += "&phone="+URLEncoder.encode(nicName2, "UTF-8");
+
+                    Log.i("username",id2);
+                    Log.i("password",password2);
+                    Log.i("phone",nicName2);
+
                     URL url = new URL(link2);
                     HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                    trustAllHosts();
+                    HttpsURLConnection httpsURLConnection = (HttpsURLConnection)url.openConnection();
+                    httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    });
+
+                    con = httpsURLConnection;
 
                     con.setDoOutput(true);
                     OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
@@ -181,35 +223,75 @@ String link = "http://192.168.10.100:8090/BoilerControl/memberGo.do";
 
             @Override
             protected void onPostExecute(String result) {
-                //uper.onPostExecute(s);
+                super.onPostExecute(result);
                 loading.dismiss();          // 다이얼로그 종료
                 if (result != null){
                     showgo1(result);        // 토근 값 가져온다 (동 호수)
+                    Log.i("result",result);
                 }else{
                     Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                 }
             }
         } // end SendLogData
         SendLogData sld = new SendLogData();
-        sld.execute(link,id,password,nicName,joinDate,serialNum);
+//        sld.execute(link,id,password,nicName,joinDate,serialNum);
+        sld.execute(link,id,password,nicName);
     }
 
     //가입후 결과
     private void showgo1(String re1){
-        if(re1.equals("idFail")){
-            Toast.makeText(getApplicationContext(),"Please check id ",Toast.LENGTH_LONG).show();
-        }if(re1.equals("nicFail")){
-            Toast.makeText(getApplicationContext(),"Please check nicname, duplicated nicname",Toast.LENGTH_LONG).show();
-        }if (re1.equals("serialFail")){
-            Toast.makeText(getApplicationContext(),"Please check serial number",Toast.LENGTH_LONG).show();
-        }if(re1.equals("joinFail")){
-            Toast.makeText(getApplicationContext(),"Member Register Failed",Toast.LENGTH_LONG).show();
-        } else if(re1.equals("joinSuccess")){
-            Toast.makeText(getApplicationContext(),"Member Register Successed",Toast.LENGTH_LONG).show();
-            SessionNow.setSession(this,"token1", re1);
-            Intent in=new Intent(MemberActivity.this,LoginActivity.class);
-            startActivity(in);
-            finish();
+        Log.i("showgo1",re1);
+//        if(re1.equals("idFail")){
+//            Toast.makeText(getApplicationContext(),"Please check id ",Toast.LENGTH_LONG).show();
+//        }if(re1.equals("nicFail")){
+//            Toast.makeText(getApplicationContext(),"Please check nicname, duplicated nicname",Toast.LENGTH_LONG).show();
+//        }if (re1.equals("serialFail")){
+//            Toast.makeText(getApplicationContext(),"Please check serial number",Toast.LENGTH_LONG).show();
+//        }if(re1.equals("joinFail")){
+//            Toast.makeText(getApplicationContext(),"Member Register Failed",Toast.LENGTH_LONG).show();
+//        } else
+
+        try{
+            JSONObject jsonObject = new JSONObject(re1);
+            String result = jsonObject.getString("result");
+            Log.i("datas",result);
+
+            if(result.equals("true")){
+                Toast.makeText(getApplicationContext(),"Member Register Successed",Toast.LENGTH_LONG).show();
+                SessionNow.setSession(this,"token1", re1);
+                Intent in=new Intent(MemberActivity.this,LoginActivity.class);
+                startActivity(in);
+                finish();
+            }
+        }catch (JSONException e){
+            e.printStackTrace();
+        }
+
+    }
+
+    private static void trustAllHosts(){
+        TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        }};
+        try{
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 

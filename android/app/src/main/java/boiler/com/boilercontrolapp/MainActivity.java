@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.net.http.HttpResponseCache;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.CookieSyncManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
@@ -29,12 +31,32 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.CookieHandler;
+import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
+import java.net.ResponseCache;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.security.SecureRandom;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedTrustManager;
+import javax.net.ssl.X509TrustManager;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -71,13 +93,19 @@ public class MainActivity extends AppCompatActivity {
 //    String link_4 = "http://deo.homedns.tv:8090/BoilerControl/heatingDelete.do"; //삭제
 //    String link_5 = "http://deo.homedns.tv:8090/BoilerControl/updateName.do"; //방 이름 변경
 
-      String link = "http://192.168.10.100:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
-    String link_2 = "http://192.168.10.100:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+//      String link = "http://192.168.10.100:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+//    String link_2 = "http://192.168.10.100:8090/BoilerControl/heatingSearch.do"; // 받는 주소
+//    String link_3 = "http://192.168.10.100:8090/BoilerControl/heatingInsert.do"; // 방 추가
+//    String link_4 = "http://192.168.10.100:8090/BoilerControl/heatingDelete.do"; //삭제
+//    String link_5 = "http://192.168.10.100:8090/BoilerControl/updateName.do"; //방 이름 변경
+
+    String link = "http://192.168.10.100:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
+    String link_2 = "https://dsrc.co.kr/manage/list"; // 등록된 보일러 및 방 개수 조회 받는 주소
     String link_3 = "http://192.168.10.100:8090/BoilerControl/heatingInsert.do"; // 방 추가
     String link_4 = "http://192.168.10.100:8090/BoilerControl/heatingDelete.do"; //삭제
     String link_5 = "http://192.168.10.100:8090/BoilerControl/updateName.do"; //방 이름 변경
 
-    String heatingPower;    // 난방 전원 값
+    String heatingMode;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
     String desiredTemp;      // 희망 온도 값
@@ -86,15 +114,18 @@ public class MainActivity extends AppCompatActivity {
     String roomName;        // 방 이름
     String nicName;
 
-    String[] heatingPower2 = new String[8];
+    String[] heatingMode2 = new String[8];
     String[] outGoingMode2 = new String[8];    // 외출 모드 값
     String[] currentTemp2 = new String[8];     // 현재 온도 값
     String[] desiredTemp2 = new String[8];      // 희망 온도 값
     String[] serialNum2 = new String[8];       // 제품 시리얼 번호
     String[] roomName2 = new String[8];        // 방 이름
+    String[] status2 = new String[8];        // 방 이름
 
     int desireAvg;
 
+    String token;
+    String signature;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
         getHeatingInfo();
         // 일정 간격 새로고침
         refresh();
-
 
     }
     private Timer timer;
@@ -349,8 +379,6 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Room add successed", Toast.LENGTH_SHORT).show();
         }
     }
-
-
     // 서버측에 난방 정보 요청
     public void getHeatingInfo() {
         class GetLogData extends AsyncTask<String, Void, String> {
@@ -365,26 +393,38 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     String link2 = params[0];
-                    String nicName2 = params[1];
-
-                    Log.i("link2",link2);
-
-                    String data = "&nicName=" + URLEncoder.encode(nicName2, "UTF-8");
 
                     URL url = new URL(link2);
-                    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+                    Log.i("link url",url.toString());
+
+                    trustAllHosts();
+                    HttpsURLConnection httpsURLConnection = (HttpsURLConnection)url.openConnection();
+                    httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    });
+                    HttpURLConnection con = httpsURLConnection;
+
+
+                    con.setUseCaches(false);
                     con.setDoOutput(true);
 
-                    OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-                    wr.write( data );
-                    wr.flush();
+                    //헤더 셋팅
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cookie","token="+token+";"+"signature="+signature);
+                    con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; cahrset=utf-8");
+                    Log.i("GetHeader",con.getHeaderFields().toString());
 
+                    con.connect();
 
-                    Log.i("getHeatingInfo","OK");
                     StringBuilder sb = new StringBuilder();
 
                     // 요청한 URL의 출력물을 BufferedReader로 받는다.
                     BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+
                     String json;
                     // 라인을 받아와 합친다
                     while ((json = br.readLine()) != null) {
@@ -394,32 +434,60 @@ public class MainActivity extends AppCompatActivity {
                     return sb.toString();
 
                 } catch (Exception e) {
+                    e.printStackTrace();
                     return null;
                 }
             }
 
             @Override
             protected void onPostExecute(String result) {
+                super.onPostExecute(result);
                 if (result != null){
-                    heatingReceive(result); // 서버로 부터 받은 값 정리
+                    Log.i("result>>",result);
+                    Log.i("getHeatingInfo","OK");
+//                    heatingReceive(result); // 서버로 부터 받은 값 정리
                 }else {
 //                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                 }
-
             }
         }
         GetLogData gld = new GetLogData();
-        gld.execute(link_2,nicName);
+        gld.execute(link_2);
 
     }
 
+    private static void trustAllHosts(){
+        TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        }};
+        try{
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 
 
 
     // 요청 값 셋팅
     private void heatingReceive(String result){
-
-        Log.i("nicName>>",nicName);
+        Log.i("result>>",result);
+//        Log.i("nicName>>",nicName);
         // 서버 측으로 부터 데이터 받아오기
         try {
             JSONObject jobj = new JSONObject(result);
@@ -429,12 +497,12 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0 ; i < ja.length()  ; i++) {
                 JSONObject order = ja.getJSONObject(i);
                 Log.i("JSONArray",order.toString());
-                heatingPower2[i] = order.getString("heatingPower");
-                outGoingMode2[i] = order.getString("outGoingMode");
-                currentTemp2[i] = order.getString("currentTemp");
-                desiredTemp2[i] = order.getString("desiredTemp");
-                serialNum2[i] = order.getString("serialNum");
-                roomName2[i] = order.getString("roomName");
+                currentTemp2[i] = order.getString("current_temp");
+                desiredTemp2[i] = order.getString("desired_temp");
+                serialNum2[i] = order.getString("device_id");
+                heatingMode2[i] = order.getString("operation_mode");
+                roomName2[i] = order.getString("room_number");
+                status2[i] = order.getString("status");
 
                 // 각 현재온도 값의 합
                 desireAvg += Integer.parseInt(currentTemp2[i]);
@@ -453,8 +521,8 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView)findViewById(R.id.container);
 
         for (int i=0 ; i < dataLength; i++){
-            adapter.add(Integer.parseInt(heatingPower2[i]),
-                    Integer.parseInt(outGoingMode2[i]),
+            adapter.add(Integer.parseInt(heatingMode2[i]),
+                    Integer.parseInt(status2[i]),
                     Double.parseDouble(currentTemp2[i]),
                     Double.parseDouble(desiredTemp2[i]),
                     serialNum2[i],
@@ -693,7 +761,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                     Log.i("avg",Integer.toString(desireAvg));
                     // 각 현재온도의 평균
-                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
+//                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
                     count = Double.parseDouble(tv_desiredTemp.getText().toString());
                 }else {
                     sw_allHeatingPower.setChecked(false);
@@ -782,7 +850,7 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Toast.makeText(getApplicationContext(),"Sending Successed",Toast.LENGTH_SHORT).show();
                                 getInfo(); // 정보 가져오기
-                                Log.i("sendOk() HeatingPower:",heatingPower);
+                                Log.i("sendOk() HeatingPower:",heatingMode);
                                 Log.i("sendOk() outGoingMode:",outGoingMode);
                                 Log.i("sendOk() desireTemp",desiredTemp);
                                 Log.i("sendOk() heatingtime",heatingtime);
@@ -832,9 +900,9 @@ public class MainActivity extends AppCompatActivity {
 
         // 난방 스위치 값 스트링으로 변환
         if(sw_allHeatingPower.isChecked()){
-            heatingPower = "1";
+            heatingMode = "1";
         }else {
-            heatingPower = "0";
+            heatingMode = "0";
         }
 
         // 외출모드 스위치 값 스트링으로 변환
@@ -922,7 +990,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }//insertData
         InsertData task = new InsertData();
-        task.execute(link,heatingPower,outGoingMode,desiredTemp,heatingtime,nicName);
+        task.execute(link,heatingMode,outGoingMode,desiredTemp,heatingtime,nicName);
     } //end insertDo
 
 
@@ -930,7 +998,7 @@ public class MainActivity extends AppCompatActivity {
     // 뒤로가기 버튼 막기
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this,R.style.AlertDialogTheme);
         builder.setTitle("App Finish");
         builder.setMessage("Are you finish?");
         builder.setPositiveButton("Finish", new DialogInterface.OnClickListener() {
@@ -953,16 +1021,11 @@ public class MainActivity extends AppCompatActivity {
     //저장된 토큰값 출력
     private void showtoken(){
         String aa= SessionNow.getSession(this,"token1");
+        String aa2= SessionNow.getSession(this,"token2");
         Log.i("aa.toString():",aa.toString());
-        //json값에서 닉네임값만 추출한다
-        try {
-            JSONObject jobj=new JSONObject(aa.toString());
-            nicName = jobj.getString("nicName");
-            tv_nicName.setText("Welcome to!! "+nicName);
-            Log.i("nicName",tv_nicName.getText().toString());
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        Log.i("aa2.toString():",aa2.toString());
+        token = aa;
+        signature = aa2;
     }
 
     //저장된 토큰값 삭제
