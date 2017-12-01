@@ -31,31 +31,21 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.CookieHandler;
-import java.net.CookieManager;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
-import java.net.ResponseCache;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
-import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509ExtendedTrustManager;
 import javax.net.ssl.X509TrustManager;
 
 public class MainActivity extends AppCompatActivity {
@@ -101,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
 
     String link = "http://192.168.10.100:8090/BoilerControl/heatingControllerUpdate.do"; // 데이터 보내는 주소
     String link_2 = "https://dsrc.co.kr/manage/list"; // 등록된 보일러 및 방 개수 조회 받는 주소
+    String link_reqStatus = "https://dsrc.co.kr/manage/room_state"; // 등록된 보일러 및 방 개수 조회 받는 주소
     String link_3 = "http://192.168.10.100:8090/BoilerControl/heatingInsert.do"; // 방 추가
     String link_4 = "http://192.168.10.100:8090/BoilerControl/heatingDelete.do"; //삭제
     String link_5 = "http://192.168.10.100:8090/BoilerControl/updateName.do"; //방 이름 변경
@@ -379,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Room add successed", Toast.LENGTH_SHORT).show();
         }
     }
-    // 서버측에 난방 정보 요청
+//     서버측에 난방 정보 요청
     public void getHeatingInfo() {
         class GetLogData extends AsyncTask<String, Void, String> {
 
@@ -393,10 +384,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
 
                     String link2 = params[0];
-
                     URL url = new URL(link2);
-
-                    Log.i("link url",url.toString());
 
                     trustAllHosts();
                     HttpsURLConnection httpsURLConnection = (HttpsURLConnection)url.openConnection();
@@ -407,44 +395,35 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     HttpURLConnection con = httpsURLConnection;
-
-
                     con.setUseCaches(false);
                     con.setDoOutput(true);
-
                     //헤더 셋팅
                     con.setRequestMethod("POST");
                     con.setRequestProperty("Cookie","token="+token+";"+"signature="+signature);
                     con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; cahrset=utf-8");
                     Log.i("GetHeader",con.getHeaderFields().toString());
 
-                    con.connect();
-
                     StringBuilder sb = new StringBuilder();
-
                     // 요청한 URL의 출력물을 BufferedReader로 받는다.
                     BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-
                     String json;
                     // 라인을 받아와 합친다
                     while ((json = br.readLine()) != null) {
                         sb.append(json);
                     }
-
                     return sb.toString();
-
                 } catch (Exception e) {
                     e.printStackTrace();
                     return null;
                 }
             }
-
             @Override
             protected void onPostExecute(String result) {
                 super.onPostExecute(result);
                 if (result != null){
                     Log.i("result>>",result);
                     Log.i("getHeatingInfo","OK");
+                    listResult(result);
 //                    heatingReceive(result); // 서버로 부터 받은 값 정리
                 }else {
 //                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
@@ -456,33 +435,104 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private static void trustAllHosts(){
-        TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
-            @Override
-            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
 
+    int bLength;
+    private void listResult(String result){
+
+        try {
+            JSONObject jobj = new JSONObject(result);
+            JSONObject jobj2 = new JSONObject(jobj.getString("data"));
+            String a = jobj2.toString();
+            String[] b = a.split("\\{|\\}|:|,|\"");
+            bLength = b.length;
+            Log.i("bLength>>",Integer.toString(bLength));
+            String[] device_id=new String[bLength];
+            String[] room_range = new String[bLength];
+            for(int i=1 ; i<=b.length/4 ; i++){
+//                Log.i("object"+i,b[i]);
+                device_id[i] = b[i*4-2];
+                room_range[i] = b[i*4];
+                Log.i("deviceID>>"+i,device_id[i]);
+                Log.i("room_range>>"+i,room_range[i]);
             }
 
-            @Override
-            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+            requestStatus(device_id, room_range);
 
-            }
 
-            @Override
-            public X509Certificate[] getAcceptedIssuers() {
-                return new X509Certificate[0];
-            }
-        }};
-        try{
-            SSLContext sc = SSLContext.getInstance("TLS");
-            sc.init(null, trustAllCerts, new SecureRandom());
-            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-        }catch(Exception e){
+        }catch (JSONException e){
             e.printStackTrace();
         }
+
     }
+    // 요청한 디바이스 정보 방 번호 입력
+    private void requestStatus(String[] device_id, String[] room_range){
+        class GetLogData extends AsyncTask<String, Void, String> {
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+
+                    String link2 = params[0];
+                    String device_id2 = params[1];
+                    String room_number2 = params[2];
+
+                    String datas = "device_id="+URLEncoder.encode(device_id2, "UTF-8");
+                     datas += "&room_number="+URLEncoder.encode(room_number2, "UTF-8");
+                    URL url = new URL(link2);
+
+                    Log.i("link2",link2);
+                    Log.i("datas",datas);
 
 
+                    trustAllHosts();
+                    HttpsURLConnection httpsURLConnection = (HttpsURLConnection)url.openConnection();
+                    httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    });
+                    HttpURLConnection con = httpsURLConnection;
+                    con.setUseCaches(false);
+                    con.setDoOutput(true);
+                    //헤더 셋팅
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cookie","token="+token+";"+"signature="+signature);
+                    con.setRequestProperty("Content-Type","application/x-www-form-urlencoded; cahrset=utf-8");
+                    Log.i("GetHeader",con.getHeaderFields().toString());
+
+//                    OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+//                    Log.i("getHeatingInfo", "OK");
+//                    wr.write(datas);  // 출력 스트림에 출력
+//                    wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
+//                    wr.close();
+
+                    StringBuilder sb = new StringBuilder();
+                    // 요청한 URL의 출력물을 BufferedReader로 받는다.
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String json;
+                    // 라인을 받아와 합친다
+                    while ((json = br.readLine()) != null) {
+                        sb.append(json);
+                    }
+                    return sb.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                if (result != null){
+                    Log.i("result>>",result);
+                }else {
+//                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        GetLogData gld = new GetLogData();
+        gld.execute(link_reqStatus, device_id[2], room_range[2]);
+    }
 
     // 요청 값 셋팅
     private void heatingReceive(String result){
@@ -1019,7 +1069,7 @@ public class MainActivity extends AppCompatActivity {
 
 
     //저장된 토큰값 출력
-    private void showtoken(){
+    public void showtoken(){
         String aa= SessionNow.getSession(this,"token1");
         String aa2= SessionNow.getSession(this,"token2");
         Log.i("aa.toString():",aa.toString());
@@ -1033,5 +1083,29 @@ public class MainActivity extends AppCompatActivity {
         SessionNow.delSession(this,"token1");
     }
 
+    private static void trustAllHosts(){
+        TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
+            @Override
+            public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
 
+            }
+
+            @Override
+            public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
+
+            }
+
+            @Override
+            public X509Certificate[] getAcceptedIssuers() {
+                return new X509Certificate[0];
+            }
+        }};
+        try{
+            SSLContext sc = SSLContext.getInstance("TLS");
+            sc.init(null, trustAllCerts, new SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 } // end class
