@@ -6,8 +6,8 @@ package boiler.com.boilercontrolapp;
 
 public class ListView_item {
 
-    private int heatingPower;
-    private int outgoingMode;
+    private int operationMode;
+    private int status;
     private double currentTemp;
     private double desiredTemp;
     private String serialNum;
@@ -30,20 +30,20 @@ public class ListView_item {
         this.serialNum = serialNum;
     }
 
-    public int getHeatingPower() {
-        return heatingPower;
+    public int getOperationMode() {
+        return operationMode;
     }
 
-    public void setHeatingPower(int heatingPower) {
-        this.heatingPower = heatingPower;
+    public void setOperationMode(int operationMode) {
+        this.operationMode = operationMode;
     }
 
-    public int getOutgoingMode() {
-        return outgoingMode;
+    public int getStatus() {
+        return status;
     }
 
-    public void setOutgoingMode(int outgoingMode) {
-        this.outgoingMode = outgoingMode;
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public double getCurrentTemp() {

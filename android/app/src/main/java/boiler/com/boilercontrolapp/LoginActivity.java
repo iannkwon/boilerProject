@@ -22,8 +22,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.CookieManager;
-import java.net.HttpCookie;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -52,27 +50,18 @@ public class LoginActivity extends AppCompatActivity {
     String id;           // id
     String password;    // 비밀번호
 
-//    String link = "http://192.168.77.105:8090/BoilerControl/loginGo.do";
-//    String link = "http://deo.homedns.tv:8090/BoilerControl/loginGo.do";
-//    String link = "http://192.168.10.100:8090/BoilerControl/loginGo.do";
     String link = "https://dsrc.co.kr/user/signin";
 
     String token;
     String signature;
-    String path;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
         loginGo();          // 로그인 클릭시
-
         memberGO();        // 회원가입
-
         clickHide();        // 에디텍스트 이외 클릭 키보드 숨기기
-
-
     }
 
     // 클릭 키보드 숨김

@@ -54,8 +54,8 @@ public class ListView_Adapter extends BaseAdapter {
 //    String link = "http://deo.homedns.tv:8090/BoilerControl/heatingUpdate.do"; // 데이터 보내는 주소
     String link = "http://192.168.10.100:8090/BoilerControl/heatingUpdate.do"; // 데이터 보내는 주소
 
-    String heatingPower;    // 난방 전원 값
-    String outGoingMode;    // 외출 모드 값
+    String operationMode;    // 난방 전원 값
+    String status;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
     String desiredTemp;      // 희망 온도 값
     String heatingtime;     // 시간
@@ -137,7 +137,7 @@ public class ListView_Adapter extends BaseAdapter {
             // 데이터가 있다면 갖고 있는 정보를 뷰에 알맞게 배치
 
             // 난방 스위치
-            if (((ListView_item) getItem(position)).getHeatingPower() == 1 ) {
+            if (((ListView_item) getItem(position)).getOperationMode() == 1 ) {
                 sw_heatingPower.setChecked(true);
                 tv_desiredTemp.setVisibility(View.VISIBLE);
                 tv_desiredTempText.setVisibility(View.VISIBLE);
@@ -150,7 +150,7 @@ public class ListView_Adapter extends BaseAdapter {
             } else {
                 sw_heatingPower.setChecked(false);
                 notifyDataSetChanged();
-                if (((ListView_item) getItem(position)).getOutgoingMode() == 0 ) {
+                if (((ListView_item) getItem(position)).getStatus() == 0 ) {
                     tv_desiredTemp.setVisibility(View.INVISIBLE);
                     tv_desiredTempText.setVisibility(View.INVISIBLE);
                     tv_desired.setVisibility(View.INVISIBLE);
@@ -159,7 +159,7 @@ public class ListView_Adapter extends BaseAdapter {
                 }
             }
             // 외출 스위치
-            if (((ListView_item) getItem(position)).getOutgoingMode() == 1 ){
+            if (((ListView_item) getItem(position)).getOperationMode() == 3 ){
                 sw_outgoingMode.setChecked(true);
                 tv_desiredTemp.setVisibility(View.VISIBLE);
                 tv_desiredTempText.setVisibility(View.VISIBLE);
@@ -169,7 +169,7 @@ public class ListView_Adapter extends BaseAdapter {
             } else {
                 sw_outgoingMode.setChecked(false);
                 notifyDataSetChanged();
-                if (((ListView_item) getItem(position)).getHeatingPower() == 0 ) {
+                if (((ListView_item) getItem(position)).getStatus() == 0 ) {
                     tv_desiredTemp.setVisibility(View.INVISIBLE);
                     tv_desiredTempText.setVisibility(View.INVISIBLE);
                     tv_desired.setVisibility(View.INVISIBLE);
@@ -190,7 +190,7 @@ public class ListView_Adapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if ( b ){
                     Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
-                    ((ListView_item) getItem(position)).setHeatingPower(1);
+                    ((ListView_item) getItem(position)).setOperationMode(1);
                     ((ListView_item) getItem(position)).getDesiredTemp();
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     tv_desiredTempText.setVisibility(View.VISIBLE);
@@ -199,22 +199,20 @@ public class ListView_Adapter extends BaseAdapter {
                     ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
                     count = ((ListView_item) getItem(position)).getDesiredTemp();
                     notifyDataSetChanged();
-                    if ( ((ListView_item) getItem(position)).getOutgoingMode() == 1 ){
-                        ((ListView_item) getItem(position)).setOutgoingMode(0);
+                    if ( ((ListView_item) getItem(position)).getOperationMode() == 3 ){
+                        ((ListView_item) getItem(position)).setOperationMode(1);
                         ((ListView_item) getItem(position)).setIcon(0);
                         notifyDataSetChanged();
                     }
 
-                    Log.i("heatingSW value1",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value1",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
+                    Log.i("heatingSW value1",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                 }
                 else {
                     Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
-                    ((ListView_item) getItem(position)).setHeatingPower(0);
+                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
-                    Log.i("heatingSW value2",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value2",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
+                    Log.i("heatingSW value2",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                 }
             }
         });
@@ -225,7 +223,7 @@ public class ListView_Adapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if ( b ){
                     Toast.makeText(mContext, "outgoingMode ON",Toast.LENGTH_SHORT).show();
-                    ((ListView_item) getItem(position)).setOutgoingMode(1);
+                    ((ListView_item) getItem(position)).setOperationMode(3);
                     ((ListView_item) getItem(position)).getDesiredTemp();
                     // 외출 스위치 On시 18도로 하기
                     ((ListView_item) getItem(position)).setDesiredTemp(18);
@@ -235,20 +233,20 @@ public class ListView_Adapter extends BaseAdapter {
                     tv_desired.setVisibility(View.VISIBLE);
                     ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
                     notifyDataSetChanged();
-                    if ( ((ListView_item) getItem(position)).getHeatingPower() == 1 ){
-                        ((ListView_item) getItem(position)).setHeatingPower(0);
+                    if ( ((ListView_item) getItem(position)).getOperationMode() == 1 ){
+                        ((ListView_item) getItem(position)).setOperationMode(3);
                         notifyDataSetChanged();
                     }
-                    Log.i("heatingSW value3",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value3",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
+                    Log.i("heatingSW value3",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
+                    Log.i("outgoing value3",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
                 else {
                     Toast.makeText(mContext, "outgoingMode OFF",Toast.LENGTH_SHORT).show();
-                    ((ListView_item) getItem(position)).setOutgoingMode(0);
+                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
-                    Log.i("heatingSW value4",Integer.toString(((ListView_item) getItem(position)).getHeatingPower()));
-                    Log.i("outgoing value4",Integer.toString(((ListView_item) getItem(position)).getOutgoingMode()));
+                    Log.i("heatingSW value4",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
+                    Log.i("outgoing value4",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
             }
         });
@@ -260,20 +258,20 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View v) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count < 45 && ( ((ListView_item) getItem(position)).getHeatingPower()==1 ||
-                        ((ListView_item) getItem(position)).getOutgoingMode()==1 ) ) { // 온도 45도 이하일 때
+                if (count < 45 && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
+                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
                     count+=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도 올리기
                     ((ListView_item) getItem(position)).setDesiredTemp(count);
                     notifyDataSetChanged();
 
-                    if (((ListView_item) getItem(position)).getHeatingPower()== 1 &&((ListView_item) getItem(position)).getCurrentTemp() < count){
+                    if (((ListView_item) getItem(position)).getOperationMode()== 1 &&((ListView_item) getItem(position)).getCurrentTemp() < count){
 //                        Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
                         ((ListView_item) getItem(position)).setIcon(R.drawable.wariming);
                         notifyDataSetChanged();
                     }
-                    if (((ListView_item) getItem(position)).getOutgoingMode()== 1){
+                    if (((ListView_item) getItem(position)).getOperationMode()== 3){
                         ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
                         notifyDataSetChanged();
                     }
@@ -289,15 +287,15 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View view) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count > 10  && ( ((ListView_item) getItem(position)).getHeatingPower()==1 ||
-                        ((ListView_item) getItem(position)).getOutgoingMode()==1 ) ) { // 온도 45도 이하일 때
+                if (count > 10  && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
+                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
                     count-=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도에 값 셋팅
                     ((ListView_item) getItem(position)).setDesiredTemp(count);
                     notifyDataSetChanged();
 
-                    if (((ListView_item) getItem(position)).getHeatingPower() == 1 && ((ListView_item) getItem(position)).getCurrentTemp() >= count){
+                    if (((ListView_item) getItem(position)).getOperationMode() == 1 && ((ListView_item) getItem(position)).getCurrentTemp() >= count){
 //                        Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                         ((ListView_item) getItem(position)).setIcon(0);
                         notifyDataSetChanged();
@@ -310,8 +308,8 @@ public class ListView_Adapter extends BaseAdapter {
             @Override
             public void onClick(View view) {
                 // 각 값들 가져오기
-                heatingPower = Integer.toString(((ListView_item) getItem(position)).getHeatingPower());
-                outGoingMode = Integer.toString(((ListView_item) getItem(position)).getOutgoingMode());
+                operationMode = Integer.toString(((ListView_item) getItem(position)).getOperationMode());
+                status = Integer.toString(((ListView_item) getItem(position)).getStatus());
                 currentTemp = Double.toString(((ListView_item) getItem(position)).getCurrentTemp());
                 desiredTemp = Double.toString(((ListView_item) getItem(position)).getDesiredTemp());
                 // 현재 시간 가져오기
@@ -325,8 +323,8 @@ public class ListView_Adapter extends BaseAdapter {
                 serialNum = ((ListView_item) getItem(position)).getSerialNum();
                 roomName = ((ListView_item) getItem(position)).getRoomName();
 
-                Log.i("heatingPower",heatingPower);
-                Log.i("outGoingMode",outGoingMode);
+                Log.i("heatingPower",operationMode);
+                Log.i("outGoingMode",status);
                 Log.i("currentTemp",currentTemp);
                 Log.i("desiredTemp",desiredTemp);
                 Log.i("heatingtime",heatingtime);
@@ -422,14 +420,14 @@ public class ListView_Adapter extends BaseAdapter {
             }
         }//insertData
         InsertData task = new InsertData();
-        task.execute(link,heatingPower,outGoingMode,currentTemp,desiredTemp,heatingtime,serialNum,roomName);
+        task.execute(link,operationMode,status,currentTemp,desiredTemp,heatingtime,serialNum,roomName);
     } //end insertDo
 
     // 데이터 추가를 위해 만듬
-    public void add(int heatingPower, int outgoingMode, double currentTemp, double desiredTemp,String serialNum,String roomNam){
+    public void add(int operationMode, int status, double currentTemp, double desiredTemp,String serialNum,String roomNam){
         ListView_item item = new ListView_item();
-        item.setHeatingPower(heatingPower);
-        item.setOutgoingMode(outgoingMode);
+        item.setOperationMode(operationMode);
+        item.setStatus(status);
         item.setCurrentTemp(currentTemp);
         item.setDesiredTemp(desiredTemp);
         item.setSerialNum(serialNum);
