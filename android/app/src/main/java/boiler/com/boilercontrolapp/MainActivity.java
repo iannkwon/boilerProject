@@ -16,12 +16,14 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.lang.reflect.GenericArrayType;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -236,20 +238,25 @@ public class MainActivity extends AppCompatActivity {
         gld.execute(link_list);
 
     }
-
-
     int bLength;
     private void listResult(String result){
-
         try {
+            ArrayList<String> array_result = new ArrayList<String>();
+            array_result.add(result);
+            Log.i("arrayList",array_result.get(0).toString());
+            JSONArray jsonArray = new JSONArray(array_result.toString());
+            Log.i("JSONOBJECT>>>",jsonArray.getJSONObject(0).toString());
+            JSONObject jsonObject = new JSONObject(jsonArray.getJSONObject(0).toString());
+
             JSONObject jobj = new JSONObject(result);
             JSONObject jobj2 = new JSONObject(jobj.getString("data"));
+
             String a = jobj2.toString();
             String[] b = a.split("\\{|\\}|:|,|\"");
             dataLength = jobj2.length();
             bLength = b.length;
             Log.i("dataLength>>",Integer.toString(dataLength));
-            String[] device_id=new String[bLength];
+            String[] device_id= new String[bLength];
             String[] room_range = new String[bLength];
             for(int i=1 ; i<=b.length/4 ; i++){
 //                Log.i("object"+i,b[i]);
@@ -265,116 +272,106 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    // 요청한 디바이스 정보 방 번호 입력
+    // 요청한 디바이스 정보 방 번호 입력해서 상태 얻어오기
+    ArrayList<String> arrayList = new ArrayList<String>();
     private void requestStatus(String[] device_id, String[] room_range){
         for (int i=1 ; i <= dataLength ; i++) {
 
             class GetLogData extends AsyncTask<String, Void, String> {
+
                 @Override
                 protected String doInBackground(String... params) {
-                    try {
-                        String link2 = params[0];
-                        String device_id2 = params[1];
-                        String room_number2 = params[2];
+                        try {
+                            String link2 = params[0];
+                            String device_id2 = params[1];
+                            String room_number2 = params[2];
 
-                        String datas = "device_id=" + URLEncoder.encode(device_id2, "UTF-8");
-                        datas += "&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
-                        URL url = new URL(link2);
+                            String datas = "device_id=" + URLEncoder.encode(device_id2, "UTF-8");
+                            datas += "&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
+                            URL url = new URL(link2);
 
-                        Log.i("link2", link2);
-                        Log.i("datas", datas);
+                            Log.i("link2", link2);
+                            Log.i("datas", datas);
 
-                        trustAllHosts();
-                        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
-                        httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
-                            @Override
-                            public boolean verify(String s, SSLSession sslSession) {
-                                return true;
+                            trustAllHosts();
+                            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                            httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                                @Override
+                                public boolean verify(String s, SSLSession sslSession) {
+                                    return true;
+                                }
+                            });
+                            HttpURLConnection con = httpsURLConnection;
+
+                            //헤더 셋팅
+                            con.setRequestMethod("POST");
+                            con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
+                            con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
+
+//                            con.setRequestMethod("POST");
+                            con.setUseCaches(false);
+                            con.setDoOutput(true);
+                            con.setDoInput(true);
+                            OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                            wr.write(datas);  // 출력 스트림에 출력
+                            wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
+                            wr.close();
+
+                            StringBuilder sb = new StringBuilder();
+                            // 요청한 URL의 출력물을 BufferedReader로 받는다.
+                            BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                            String json;
+                            // 라인을 받아와 합친다
+                            while ((json = br.readLine()) != null) {
+                                sb.append(json);
                             }
-                        });
-                        HttpURLConnection con = httpsURLConnection;
-
-                        //헤더 셋팅
-                        con.setRequestMethod("POST");
-                        con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
-                        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
-
-                        con.setRequestMethod("POST");
-                        con.setUseCaches(false);
-                        con.setDoOutput(true);
-                        con.setDoInput(true);
-                        OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-                        Log.i("getHeatingInfo", "OK");
-                        wr.write(datas);  // 출력 스트림에 출력
-                        wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
-                        wr.close();
-
-                        StringBuilder sb = new StringBuilder();
-                        // 요청한 URL의 출력물을 BufferedReader로 받는다.
-                        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                        String json;
-                        // 라인을 받아와 합친다
-                        while ((json = br.readLine()) != null) {
-                            sb.append(json);
+                            return sb.toString();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
                         }
-                        return sb.toString();
-
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        return null;
                     }
-                }
                 @Override
                 protected void onPostExecute(String result) {
                         super.onPostExecute(result);
                         if (result != null) {
-//                            Log.i("result>>", result);
-                            heatingReceive(result);
+                            arrayList.add(result);
+//                            Log.i("Array>>>",arrayList.toString());
+                            if (arrayList.size() == dataLength){
+                                heatingReceive();
+                            }
                         } else {
                     Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                         }
                 }
             }
             GetLogData gld = new GetLogData();
-
             gld.execute(link_reqStatus, device_id[i], room_range[i]);
         }
     }
     // 요청 값 셋팅
-    private void heatingReceive(String result){
-//        Log.i("result>>",result);
+    private void heatingReceive(){
         // 서버 측으로 부터 데이터 받아오기
         try {
-            ArrayList arrayList = new ArrayList<String>();
 
-            arrayList.add(result);
-            Log.i("ArrayList",arrayList.toString());
+            JSONArray jarray = new JSONArray(arrayList.toString());
+            for(int i=0 ; i <arrayList.size() ; i++){
+                JSONObject jobj = jarray.getJSONObject(i);
+                JSONObject jobj2 = new JSONObject(jobj.getString("data"));
+                currentTemp2[i] = jobj2.getString("current_temp");
+                desiredTemp2[i] = jobj2.getString("desired_temp");
+                serialNum2[i] = jobj2.getString("device_id");
+                operationMode2[i] = jobj2.getString("operation_mode");
+                roomName2[i] = jobj2.getString("room_number");
+                status2[i] = jobj2.getString("status");
 
-              JSONObject jobj = new JSONObject(result);
-              JSONObject jobj2 = new JSONObject(jobj.getString("data"));
-              Log.i("Jobj2>>>",jobj2.toString());
-                currentTemp2[1] = jobj2.getString("current_temp");
-                desiredTemp2[1] = jobj2.getString("desired_temp");
-                serialNum2[1] = jobj2.getString("device_id");
-                operationMode2[1] = jobj2.getString("operation_mode");
-                roomName2[1] = jobj2.getString("room_number");
-                status2[1] = jobj2.getString("status");
-
-//              for(int i=1 ; i <=dataLength2 ; i++){
-//                  currentTemp2[i] = jobj2.getString("current_temp");
-//                desiredTemp2[i] = jobj2.getString("desired_temp");
-//                serialNum2[i] = jobj2.getString("device_id");
-//                  operationMode2[i] = jobj2.getString("operation_mode");
-//                roomName2[i] = jobj2.getString("room_number");
-//                status2[i] = jobj2.getString("status");
-//
-//                Log.i("Current_"+i,currentTemp2[i]);
-//                Log.i("desiredTemp_"+i,desiredTemp2[i]);
-//                Log.i("serialNum_"+i,serialNum2[i]);
-//                Log.i("heatingMode_"+i,operationMode2[i]);
-//                Log.i("roomName_"+i,roomName2[i]);
-//                Log.i("status_"+i,status2[i]);
-//              }
+                Log.i("Current_"+i,currentTemp2[i]);
+                Log.i("desiredTemp_"+i,desiredTemp2[i]);
+                Log.i("serialNum_"+i,serialNum2[i]);
+                Log.i("heatingMode_"+i,operationMode2[i]);
+                Log.i("roomName_"+i,roomName2[i]);
+                Log.i("status_"+i,status2[i]);
+            }
             setAdapter();
 
         }catch (JSONException e){
@@ -387,22 +384,15 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ListView_Adapter(getApplicationContext());
 //        // 리스트뷰 참조 및 Adapter달기
         listView = (ListView)findViewById(R.id.container);
-//        for (int i=0 ; i < dataLength2; i++){
-            adapter.add(Integer.parseInt(operationMode2[1]),
-                    Integer.parseInt(status2[1]),
-                    Double.parseDouble(currentTemp2[1]),
-                    Double.parseDouble(desiredTemp2[1]),
-                    serialNum2[1],
-                    roomName2[1]);
+        for (int i=0 ; i < dataLength; i++){
+            adapter.add(Integer.parseInt(operationMode2[i]),
+                    Integer.parseInt(status2[i]),
+                    Double.parseDouble(currentTemp2[i]),
+                    Double.parseDouble(desiredTemp2[i]),
+                    serialNum2[i],
+                    roomName2[i]);
             adapter.notifyDataSetChanged();
-
-//            Log.i("operationMode2>>",operationMode2[i]);
-//            Log.i("status2>>",status2[i]);
-//            Log.i("currentTemp2>>",currentTemp2[i]);
-//            Log.i("desiredTemp2>>",desiredTemp2[i]);
-//            Log.i("serialNum2>>",serialNum2[i]);
-//            Log.i("roomName2>>",roomName2[i]);
-//        }
+        }
         listView.setAdapter(adapter);
     }
     private void buttonSetting() {
@@ -436,7 +426,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
         sw_allOutgoingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
@@ -463,7 +452,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
         // 현재 온도값 가져오기
         count = Double.parseDouble(tv_desiredTemp.getText().toString());
         // 온도 상승 버튼
@@ -488,7 +476,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
     // SAVE 버튼
     private void sendOk() {
         btn_save = (Button) findViewById(R.id.btn_save);
@@ -496,7 +483,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
             }
-
         });
     }
     // 안드로이드 입력 정보 가져오기
@@ -509,7 +495,6 @@ public class MainActivity extends AppCompatActivity {
         java.text.SimpleDateFormat sdfNow = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         // nowDate 변수에 값을 저장한다
         heatingtime = sdfNow.format(date);
-
         // 희망 온도 가져오기
         desiredTemp = tv_desiredTemp.getText().toString();
         // 현재 온도 가져오기
@@ -518,21 +503,18 @@ public class MainActivity extends AppCompatActivity {
         roomName = tv_name.getText().toString();
         // 시리얼 넘버 가져오기
         serialNum = tv_serialNum.getText().toString();
-
         // 난방 스위치 값 스트링으로 변환
         if(sw_allHeatingPower.isChecked()){
             heatingMode = "1";
         }else {
             heatingMode = "0";
         }
-
         // 외출모드 스위치 값 스트링으로 변환
         if(sw_allOutgoingMode.isChecked()){
             outGoingMode = "1";
         }else {
             outGoingMode = "0";
         }
-
     } // end getInfo
 
     // 뒤로가기 버튼 막기
@@ -556,22 +538,16 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.show();
     }
-
-
     //저장된 토큰값 출력
     public void showtoken(){
-        String sessionToken= SessionNow.getSession(this,"token1");
-        String sessionSignature= SessionNow.getSession(this,"token2");
-        token = sessionToken;
-        signature = sessionSignature;
+        token= SessionNow.getSession(this,"token1");
+        signature= SessionNow.getSession(this,"token2");
     }
-
     //저장된 토큰값 삭제
     private void deltoken(){
         SessionNow.delSession(this,"token1");
         SessionNow.delSession(this,"token2");
     }
-
     //TrustManager
     private static void trustAllHosts(){
         TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
