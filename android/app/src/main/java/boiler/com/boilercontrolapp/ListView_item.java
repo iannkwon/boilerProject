@@ -12,6 +12,7 @@ public class ListView_item {
     private double desiredTemp;
     private String serialNum;
     private String roomName;
+    private String roomNum;
     private int icon;
 
     public String getRoomName() {
@@ -60,6 +61,14 @@ public class ListView_item {
 
     public void setDesiredTemp(double desiredTemp) {
         this.desiredTemp = desiredTemp;
+    }
+
+    public String getRoomNum() {
+        return roomNum;
+    }
+
+    public void setRoomNum(String roomNum) {
+        this.roomNum = roomNum;
     }
 
     public int getIcon() {

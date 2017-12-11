@@ -68,7 +68,8 @@ public class ListView_Adapter extends BaseAdapter {
     String desiredTemp;      // 희망 온도 값
     String heatingtime;     // 시간
     String serialNum;       // 제품 시리얼 번호
-    String roomName;        // 방 이름
+    String roomNum;        // 방 이름
+//    String roomName;        // 방 이름
 
     String token;
     String signature;
@@ -162,16 +163,15 @@ public class ListView_Adapter extends BaseAdapter {
             } else if(((ListView_item) getItem(position)).getOperationMode() != 1) {
                 sw_heatingPower.setChecked(false);
                 notifyDataSetChanged();
-                if (((ListView_item) getItem(position)).getStatus() == 0 ) {
+//                if (((ListView_item) getItem(position)).getStatus() == 0 ) {
                     tv_desiredTemp.setVisibility(View.INVISIBLE);
                     tv_desiredTempText.setVisibility(View.INVISIBLE);
                     tv_desired.setVisibility(View.INVISIBLE);
-
-                    notifyDataSetChanged();
-                }
+//                    notifyDataSetChanged();
+//                }
             }
             // 외출 스위치
-            if (((ListView_item) getItem(position)).getOperationMode() == 3 ){
+            if (((ListView_item) getItem(position)).getOperationMode() == 2 ){
                 sw_outgoingMode.setChecked(true);
                 tv_desiredTemp.setVisibility(View.VISIBLE);
                 tv_desiredTempText.setVisibility(View.VISIBLE);
@@ -182,7 +182,7 @@ public class ListView_Adapter extends BaseAdapter {
                     ((ListView_item) getItem(position)).setStatus(1);
                     notifyDataSetChanged();
                 }
-            } else if (((ListView_item) getItem(position)).getOperationMode() != 3){
+            } else if (((ListView_item) getItem(position)).getOperationMode() != 2){
                 sw_outgoingMode.setChecked(false);
                 notifyDataSetChanged();
                 if (((ListView_item) getItem(position)).getStatus() == 0 ) {
@@ -201,30 +201,29 @@ public class ListView_Adapter extends BaseAdapter {
                 if ( b ){
                     Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(1);
-//                    ((ListView_item) getItem(position)).setStatus(1);
+                    ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
+                    count = ((ListView_item) getItem(position)).getDesiredTemp();
                     ((ListView_item) getItem(position)).getDesiredTemp();
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     tv_desiredTempText.setVisibility(View.VISIBLE);
                     tv_desired.setVisibility(View.VISIBLE);
-                    // 현재 온도 넣기
-                    ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
-                    count = ((ListView_item) getItem(position)).getDesiredTemp();
                     notifyDataSetChanged();
-//                    if ( ((ListView_item) getItem(position)).getOperationMode() == 3 ){
-//                        ((ListView_item) getItem(position)).setOperationMode(1);
-//                        ((ListView_item) getItem(position)).setIcon(0);
-//                        notifyDataSetChanged();
-//                    }
-
+                    if ( sw_outgoingMode.isChecked() ){
+                        sw_outgoingMode.setChecked(false);
+                        notifyDataSetChanged();
+                    }
                     Log.i("getOperationMode value1",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value1",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
                 else {
                     Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(0);
-                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
+                    if (((ListView_item) getItem(position)).getStatus() == 1){
+                        ((ListView_item) getItem(position)).setStatus(0);
+                        notifyDataSetChanged();
+                    }
                     Log.i("getOperationMode value2",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value2",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
@@ -237,7 +236,7 @@ public class ListView_Adapter extends BaseAdapter {
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if ( b ){
                     Toast.makeText(mContext, "outgoingMode ON",Toast.LENGTH_SHORT).show();
-                    ((ListView_item) getItem(position)).setOperationMode(3);
+                    ((ListView_item) getItem(position)).setOperationMode(2);
 //                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).getDesiredTemp();
                     // 외출 스위치 On시 18도로 하기
@@ -248,19 +247,23 @@ public class ListView_Adapter extends BaseAdapter {
                     tv_desired.setVisibility(View.VISIBLE);
                     ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
                     notifyDataSetChanged();
-//                    if ( ((ListView_item) getItem(position)).getOperationMode() == 1 ){
-//                        ((ListView_item) getItem(position)).setOperationMode(3);
-//                        notifyDataSetChanged();
-//                    }
+
+                    if ( sw_heatingPower.isChecked() ){
+                        sw_heatingPower.setChecked(false);
+                    notifyDataSetChanged();
+                }
                     Log.i("getOperationMode value3",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value3",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
                 else {
                     Toast.makeText(mContext, "outgoingMode OFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(0);
-                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).setIcon(0);
                     notifyDataSetChanged();
+                    if (((ListView_item) getItem(position)).getStatus() == 1){
+                        ((ListView_item) getItem(position)).setStatus(0);
+                        notifyDataSetChanged();
+                    }
                     Log.i("getOperationMode value4",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value4",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
@@ -313,6 +316,7 @@ public class ListView_Adapter extends BaseAdapter {
                     if (((ListView_item) getItem(position)).getOperationMode() == 1 && ((ListView_item) getItem(position)).getCurrentTemp() >= count){
 //                        Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                         ((ListView_item) getItem(position)).setIcon(0);
+//                        ((ListView_item) getItem(position)).setStatus(0);
                         notifyDataSetChanged();
                     }
                 }
@@ -336,7 +340,7 @@ public class ListView_Adapter extends BaseAdapter {
                 // nowDate 변수에 값을 저장한다
                 heatingtime = sdfNow.format(date);
                 serialNum = ((ListView_item) getItem(position)).getSerialNum();
-                roomName = ((ListView_item) getItem(position)).getRoomName();
+                roomNum = ((ListView_item) getItem(position)).getRoomNum();
 
                 Log.i("operationMode",operationMode);
                 Log.i("status",status);
@@ -344,15 +348,21 @@ public class ListView_Adapter extends BaseAdapter {
                 Log.i("desiredTemp",desiredTemp);
                 Log.i("heatingtime",heatingtime);
                 Log.i("serialNum",serialNum);
-                Log.i("roomName",roomName);
+                Log.i("roomName",roomNum);
 
                 token = SessionNow.getSession(mContext, "token1");
                 signature = SessionNow.getSession(mContext, "token2");
                 Log.i("token value>>>", token);
                 Log.i("signature value>>>", signature);
 
-                // 서버에 값 전송
-                insertDo();
+                if (!serialNum.equals("") && !roomNum.equals("") && operationMode != "0"){
+                    // 서버에 값 전송
+                    insertDo();
+                }else{
+                    Toast.makeText(mContext, "Wrong Value",Toast.LENGTH_SHORT).show();
+                }
+
+
             }
         });
 
@@ -383,7 +393,7 @@ public class ListView_Adapter extends BaseAdapter {
 
                     String data ="device_id=" + URLEncoder.encode(device_id2, "UTF-8");
                     data +="&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
-                    data += "&desiredTemp=" + URLEncoder.encode(desiredTemp2, "UTF-8");
+                    data += "&desired_temp=" + URLEncoder.encode(desiredTemp2, "UTF-8");
                     data += "&operation_mode=" + URLEncoder.encode(operation_mode2, "UTF-8");
                     data += "&status=" + URLEncoder.encode(status2, "UTF-8");
 
@@ -403,12 +413,10 @@ public class ListView_Adapter extends BaseAdapter {
                     // 접속
                     HttpURLConnection con = httpsURLConnection;
 
-
                     //헤더 셋팅
                     con.setRequestMethod("POST");
                     con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
                     con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
-
 
                     // 서버로 쓰기 보드 지정 cf.setDoInput = 서버에서 읽기모드 지정
                     con.setUseCaches(false);
@@ -450,18 +458,19 @@ public class ListView_Adapter extends BaseAdapter {
             }
         }//insertData
         InsertData task = new InsertData();
-        task.execute(link_set,serialNum,roomName,desiredTemp,operationMode,status);
+        task.execute(link_set,serialNum,roomNum,desiredTemp,operationMode,status);
     } //end insertDo
 
     // 데이터 추가를 위해 만듬
-    public void add(int operationMode, int status, double currentTemp, double desiredTemp,String serialNum,String roomNam){
+    public void add(int operationMode, int status, double currentTemp, double desiredTemp,String serialNum,String roomName,String roomNum){
         ListView_item item = new ListView_item();
         item.setOperationMode(operationMode);
         item.setStatus(status);
         item.setCurrentTemp(currentTemp);
         item.setDesiredTemp(desiredTemp);
         item.setSerialNum(serialNum);
-        item.setRoomName(roomNam);
+        item.setRoomName(roomName);
+        item.setRoomNum(roomNum);
 
         mItemData.add(item);
     }

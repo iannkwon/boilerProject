@@ -1,14 +1,19 @@
 package boiler.com.boilercontrolapp;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -23,7 +28,6 @@ import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.GenericArrayType;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -32,6 +36,7 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -63,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
 
     String link_list = "https://dsrc.co.kr/manage/list"; // 등록된 보일러 및 방 개수 조회 받는 주소
     String link_reqStatus = "https://dsrc.co.kr/manage/room_state"; // 등록된 보일러 및 방 개수 조회 받는 주소
+    String link_addDevice = "https://dsrc.co.kr/user/add_device"; // 새 보일러 등록
+    String link_set = "https://dsrc.co.kr/manage/set?=";        // 상태 전송
 
     String heatingMode;    // 난방 전원 값
     String outGoingMode;    // 외출 모드 값
@@ -70,12 +77,16 @@ public class MainActivity extends AppCompatActivity {
     String desiredTemp;      // 희망 온도 값
     String heatingtime;     // 시간
     String serialNum;       // 제품 시리얼 번호
+    String operationMode;
+    String status;
+    String roomNum;        // 방 이름
     String roomName;        // 방 이름
 
     String[] operationMode2 = new String[8];   // 작동 모드
     String[] currentTemp2 = new String[8];     // 현재 온도 값
     String[] desiredTemp2 = new String[8];      // 희망 온도 값
     String[] serialNum2 = new String[8];       // 제품 시리얼 번호
+    String[] roomNum2 = new String[8];        // 방 이름
     String[] roomName2 = new String[8];        // 방 이름
     String[] status2 = new String[8];        // 상태
 
@@ -336,9 +347,10 @@ public class MainActivity extends AppCompatActivity {
                         super.onPostExecute(result);
                         if (result != null) {
                             arrayList.add(result);
-//                            Log.i("Array>>>",arrayList.toString());
+
                             if (arrayList.size() == dataLength){
                                 heatingReceive();
+                                Log.i("Array>>>",arrayList.toString());
                             }
                         } else {
                     Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
@@ -353,23 +365,28 @@ public class MainActivity extends AppCompatActivity {
     private void heatingReceive(){
         // 서버 측으로 부터 데이터 받아오기
         try {
-
+            Log.i("Array>>>",arrayList.toString());
             JSONArray jarray = new JSONArray(arrayList.toString());
             for(int i=0 ; i <arrayList.size() ; i++){
                 JSONObject jobj = jarray.getJSONObject(i);
                 JSONObject jobj2 = new JSONObject(jobj.getString("data"));
                 currentTemp2[i] = jobj2.getString("current_temp");
-                desiredTemp2[i] = jobj2.getString("desired_temp");
                 serialNum2[i] = jobj2.getString("device_id");
                 operationMode2[i] = jobj2.getString("operation_mode");
-                roomName2[i] = jobj2.getString("room_number");
+                roomNum2[i] = jobj2.getString("room_number");
                 status2[i] = jobj2.getString("status");
+                desiredTemp2[i] = jobj2.getString("desired_temp");
 
-                Log.i("Current_"+i,currentTemp2[i]);
+                if (desiredTemp2[i].equals("null")){
+                    desiredTemp2[i] = currentTemp2[i];
+                }
+
                 Log.i("desiredTemp_"+i,desiredTemp2[i]);
+                Log.i("Current_"+i,currentTemp2[i]);
+
                 Log.i("serialNum_"+i,serialNum2[i]);
                 Log.i("heatingMode_"+i,operationMode2[i]);
-                Log.i("roomName_"+i,roomName2[i]);
+                Log.i("roomName_"+i,roomNum2[i]);
                 Log.i("status_"+i,status2[i]);
             }
             setAdapter();
@@ -385,16 +402,19 @@ public class MainActivity extends AppCompatActivity {
 //        // 리스트뷰 참조 및 Adapter달기
         listView = (ListView)findViewById(R.id.container);
         for (int i=0 ; i < dataLength; i++){
+            roomName2[i] = SessionNow.getSession(this, serialNum2[i]);
             adapter.add(Integer.parseInt(operationMode2[i]),
                     Integer.parseInt(status2[i]),
                     Double.parseDouble(currentTemp2[i]),
                     Double.parseDouble(desiredTemp2[i]),
                     serialNum2[i],
-                    roomName2[i]);
+                    roomName2[i],
+                    roomNum2[i]);
             adapter.notifyDataSetChanged();
         }
         listView.setAdapter(adapter);
     }
+
     private void buttonSetting() {
         tv_desiredTemp.setVisibility(View.INVISIBLE);
         desiredTemp_text.setVisibility(View.INVISIBLE);
@@ -475,16 +495,253 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+
+        // 장비 추가
+        btn_add.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme);
+                // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
+                final Context context = getApplicationContext();
+                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+                // 레이아웃 설정
+                View layout = inflater.inflate(R.layout.add_layout,
+                        (ViewGroup) findViewById(R.id.layout_add));
+                final EditText add_serialNum = (EditText) layout.findViewById(R.id.add_serialNum);
+                final EditText add_roomName = (EditText) layout.findViewById(R.id.add_roomName);
+                ab.setTitle("Add Room");
+                ab.setView(layout);
+                ab.setPositiveButton("OK",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                serialNum = add_serialNum.getText().toString();
+                                roomName = add_roomName.getText().toString();
+
+                                SessionNow.setSession(context, serialNum, roomName);
+
+                                Log.i("getSession>>>",SessionNow.getSession(context,serialNum));
+                                if ( !serialNum.equals("") && !roomName.equals("")) {
+                                    //                                    Toast.makeText(getApplicationContext(), "Add Room", Toast.LENGTH_SHORT).show();
+                                    if (dataLength < 7){
+                                        // 제품 추가
+                                        addDevice();
+                                        Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), "Over Room, You can register up to 8 room", Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
+                                }
+                                // 새로고침
+                                getHeatingInfo();
+                            }
+                        });
+                ab.setNegativeButton("CANCEL",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                dialogInterface.cancel();
+                            }
+                        });
+                ab.show();
+            }
+        });
     }
+    private void addDevice(){
+        class GetLogData extends AsyncTask<String, Void, String> {
+
+            @Override
+            protected String doInBackground(String... params) {
+                try {
+                    String link2 = params[0];
+                    String device_id2 = params[1];
+
+                    String datas = "device_id=" + URLEncoder.encode(device_id2, "UTF-8");
+                    URL url = new URL(link2);
+
+                    Log.i("link2", link2);
+                    Log.i("datas", datas);
+
+                    trustAllHosts();
+                    HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                    httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    });
+                    HttpURLConnection con = httpsURLConnection;
+
+                    //헤더 셋팅
+                    con.setRequestMethod("POST");
+                    con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
+                    con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
+
+//                            con.setRequestMethod("POST");
+                    con.setUseCaches(false);
+                    con.setDoOutput(true);
+                    con.setDoInput(true);
+                    OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                    wr.write(datas);  // 출력 스트림에 출력
+                    wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
+                    wr.close();
+
+                    StringBuilder sb = new StringBuilder();
+                    // 요청한 URL의 출력물을 BufferedReader로 받는다.
+                    BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                    String json;
+                    // 라인을 받아와 합친다
+                    while ((json = br.readLine()) != null) {
+                        sb.append(json);
+                    }
+                    return sb.toString();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            }
+            @Override
+            protected void onPostExecute(String result) {
+                super.onPostExecute(result);
+                if (result != null) {
+                    Log.i("addResult",result);
+                } else {
+                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+        GetLogData gld = new GetLogData();
+        gld.execute(link_addDevice, serialNum);
+    }
+
     // SAVE 버튼
     private void sendOk() {
         btn_save = (Button) findViewById(R.id.btn_save);
         btn_save.setOnClickListener(new View.OnClickListener() {
+
             @Override
             public void onClick(View v) {
+                getInfo(); // 정보 가져오기
+                insertDo();
+                new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme)
+                        .setTitle("All Control")
+                        .setMessage("Are you All Control?")
+                        .setCancelable(false)
+                        .setPositiveButton("SAVE", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getApplicationContext(),"Sending Successed",Toast.LENGTH_SHORT).show();
+                                getInfo(); // 정보 가져오기
+
+                                // 데이터 전송
+                                if (!desiredTemp.equals("") && !heatingtime.equals("") )
+                                {
+                                    insertDo();     // 값 전송
+//                                    getHeatingInfo(); // 값 반영
+                                } else{
+                                    Toast.makeText(getApplicationContext(),"Heating Off.",Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(getApplicationContext(),"Sending Cancel",Toast.LENGTH_SHORT).show();
+                            }
+                        }).show();
             }
         });
     }
+
+    // 등록된 모든 보일러 서버에 값 전송
+    private void insertDo() {
+        Log.i("dataLength>>>", Integer.toString(dataLength));
+        for (int i = 1; i <= dataLength; i++) {
+            Log.i("SerialNum>>>"+i, serialNum2[i]);
+            Log.i("roomNum>>>"+i, roomNum2[i]);
+            class InsertData extends AsyncTask<String, Void, String> {
+
+                @Override
+                protected String doInBackground(String... params) {
+                    try {
+                        String link2 = params[0];             // 접속 주소
+                        String device_id2 = params[1];
+                        String room_number2 = params[2];
+                        String desiredTemp2 = params[3];
+                        String operation_mode2 = params[4];
+//                        String status2 = params[5];
+
+                        String datas = "device_id=" + URLEncoder.encode(device_id2, "UTF-8");
+                        datas += "&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
+                        datas += "&desired_temp=" + URLEncoder.encode(desiredTemp2, "UTF-8");
+                        datas += "&operation_mode=" + URLEncoder.encode(operation_mode2, "UTF-8");
+//                        data += "&status=" + URLEncoder.encode(status2, "UTF-8");
+
+                        Log.i("test",datas);
+
+                        // URL설정
+                        URL url = new URL(link2);
+
+                        trustAllHosts();
+                        HttpsURLConnection httpsURLConnection = (HttpsURLConnection) url.openConnection();
+                        httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                            @Override
+                            public boolean verify(String s, SSLSession sslSession) {
+                                return true;
+                            }
+                        });
+
+                        // 접속
+                        HttpURLConnection con = httpsURLConnection;
+
+                        //헤더 셋팅
+                        con.setRequestMethod("POST");
+                        con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
+                        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
+
+                        // 서버로 쓰기 보드 지정 cf.setDoInput = 서버에서 읽기모드 지정
+                        con.setUseCaches(false);
+                        con.setDoOutput(true);
+                        con.setDoInput(true);
+
+                        OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+//                        Log.i("getHeatingInfo", "OK");
+                        wr.write(datas);  // 출력 스트림에 출력
+                        wr.flush(); //출력 스트림을 플러시하고 버퍼링 된 모든 출력 바이트를 강제 실행
+                        wr.close();
+
+                        // Get the response
+                        StringBuilder sb = new StringBuilder();
+
+                        // 요청한 URL의 출력물을 BufferedReader로 받는다.
+                        BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                        String json;
+
+                        // 라인을 받아와 합친다
+                        // 서버에서 라인단위로 보내줄 것이므로 라인 단위로 받는다
+                        while ((json = br.readLine()) != null) {
+                            sb.append(json);
+                        }
+                        // 전송 결과를 전역변수에 저장
+                        return sb.toString();
+
+                    } catch (Exception e) {
+                        return null;
+                    }
+                } // end doln
+
+                @Override
+                protected void onPostExecute(String result) {
+//                    super.onPostExecute(result);
+                    Log.i("Allcontrol Result>>>", result);
+                }
+            }//insertData
+            InsertData task = new InsertData();
+            task.execute(link_set, serialNum2[i], roomNum2[i]);
+        } //end insertDo
+    }
+
     // 안드로이드 입력 정보 가져오기
     private void getInfo(){
         // 현재 시간 가져오기
@@ -497,24 +754,24 @@ public class MainActivity extends AppCompatActivity {
         heatingtime = sdfNow.format(date);
         // 희망 온도 가져오기
         desiredTemp = tv_desiredTemp.getText().toString();
-        // 현재 온도 가져오기
-        currentTemp = "0";
         // 방 이름 가져오기
         roomName = tv_name.getText().toString();
         // 시리얼 넘버 가져오기
         serialNum = tv_serialNum.getText().toString();
         // 난방 스위치 값 스트링으로 변환
         if(sw_allHeatingPower.isChecked()){
-            heatingMode = "1";
+            operationMode = "1";
         }else {
-            heatingMode = "0";
+//            operationMode = "0";
         }
         // 외출모드 스위치 값 스트링으로 변환
         if(sw_allOutgoingMode.isChecked()){
-            outGoingMode = "1";
+            operationMode = "2";
         }else {
-            outGoingMode = "0";
+//            operationMode = "0";
         }
+        Log.i("OperationMode",operationMode);
+        Log.i("desiredTemp",desiredTemp);
     } // end getInfo
 
     // 뒤로가기 버튼 막기
@@ -526,7 +783,7 @@ public class MainActivity extends AppCompatActivity {
         builder.setPositiveButton("Finish", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                deltoken(); //토근값 삭제
+//                deltoken(); //토근값 삭제
                 finish();
             }
         });
