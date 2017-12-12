@@ -25,7 +25,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -66,10 +65,8 @@ public class ListView_Adapter extends BaseAdapter {
     String status;    // 외출 모드 값
     String currentTemp;     // 현재 온도 값
     String desiredTemp;      // 희망 온도 값
-    String heatingtime;     // 시간
     String serialNum;       // 제품 시리얼 번호
     String roomNum;        // 방 이름
-//    String roomName;        // 방 이름
 
     String token;
     String signature;
@@ -159,6 +156,9 @@ public class ListView_Adapter extends BaseAdapter {
                     iv_warm.setImageResource(R.drawable.fire);
                     ((ListView_item) getItem(position)).setStatus(1);
                     notifyDataSetChanged();
+                }else{
+                    ((ListView_item) getItem(position)).setStatus(0);
+                    notifyDataSetChanged();
                 }
             } else if(((ListView_item) getItem(position)).getOperationMode() != 1) {
                 sw_heatingPower.setChecked(false);
@@ -175,13 +175,13 @@ public class ListView_Adapter extends BaseAdapter {
                 if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp()){
                     ((ListView_item) getItem(position)).setStatus(1);
                     notifyDataSetChanged();
+                }else {
+                    ((ListView_item) getItem(position)).setStatus(0);
+                    notifyDataSetChanged();
                 }
             } else if (((ListView_item) getItem(position)).getOperationMode() != 2){
                 sw_outgoingMode.setChecked(false);
                 notifyDataSetChanged();
-                if (((ListView_item) getItem(position)).getStatus() == 0 ) {
-                    notifyDataSetChanged();
-                }
             }
         }
 
@@ -190,8 +190,8 @@ public class ListView_Adapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if ( b ){
-                    Toast.makeText(mContext, "HeatingON",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(1);
+                    ((ListView_item) getItem(position)).setStatus(0);
                     ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
                     count = ((ListView_item) getItem(position)).getDesiredTemp();
                     ((ListView_item) getItem(position)).getDesiredTemp();
@@ -199,17 +199,20 @@ public class ListView_Adapter extends BaseAdapter {
                     tv_desiredTempText.setVisibility(View.VISIBLE);
                     tv_desired.setVisibility(View.VISIBLE);
                     notifyDataSetChanged();
-                    if ( ((ListView_item) getItem(position)).getOperationMode() ==2 ){
-                        ((ListView_item) getItem(position)).setOperationMode(1);
-                        notifyDataSetChanged();
-                    }
+                     if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp() ){
+                    ((ListView_item) getItem(position)).setStatus(1);
+                    notifyDataSetChanged();
+                    }else{
+                         ((ListView_item) getItem(position)).setStatus(0);
+                         notifyDataSetChanged();
+                     }
                     Log.i("getOperationMode value1",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value1",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
                 else {
-                    Toast.makeText(mContext, "HeatingOFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(2);
                     ((ListView_item) getItem(position)).setIcon(0);
+                    ((ListView_item) getItem(position)).setDesiredTemp(18);
                     notifyDataSetChanged();
                     Log.i("getOperationMode value2",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value2",Integer.toString(((ListView_item) getItem(position)).getStatus()));
@@ -222,7 +225,6 @@ public class ListView_Adapter extends BaseAdapter {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                 if ( b ){
-                    Toast.makeText(mContext, "outgoingMode ON",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(2);
                     ((ListView_item) getItem(position)).getDesiredTemp();
                     // 외출 스위치 On시 18도로 하기
@@ -234,16 +236,19 @@ public class ListView_Adapter extends BaseAdapter {
                     ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
                     notifyDataSetChanged();
 
-                    if ( ((ListView_item) getItem(position)).getOperationMode() == 1 ){
-                        ((ListView_item) getItem(position)).setOperationMode(2);
+                    if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp() ){
+                        ((ListView_item) getItem(position)).setStatus(1);
                         notifyDataSetChanged();
-                }
+                    }else{
+                        ((ListView_item) getItem(position)).setStatus(0);
+                        notifyDataSetChanged();
+                    }
                     Log.i("getOperationMode value3",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value3",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
                 else {
-                    Toast.makeText(mContext, "outgoingMode OFF",Toast.LENGTH_SHORT).show();
                     ((ListView_item) getItem(position)).setOperationMode(1);
+                    ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
                     notifyDataSetChanged();
                     Log.i("getOperationMode value4",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
                     Log.i("getStatus value4",Integer.toString(((ListView_item) getItem(position)).getStatus()));
@@ -310,14 +315,6 @@ public class ListView_Adapter extends BaseAdapter {
                 status = Integer.toString(((ListView_item) getItem(position)).getStatus());
                 currentTemp = Double.toString(((ListView_item) getItem(position)).getCurrentTemp());
                 desiredTemp = Double.toString(((ListView_item) getItem(position)).getDesiredTemp());
-                // 현재 시간 가져오기
-                long rNow = System.currentTimeMillis();
-                // 현재 시간을 date변수에 저장한다.
-                Date date = new Date(rNow);
-                // 시간을 나타낼 포맷을 정한다 (yyyy/MM/dd 같은 형태로 변형 가능)
-                java.text.SimpleDateFormat sdfNow = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-                // nowDate 변수에 값을 저장한다
-                heatingtime = sdfNow.format(date);
                 serialNum = ((ListView_item) getItem(position)).getSerialNum();
                 roomNum = ((ListView_item) getItem(position)).getRoomNum();
 
@@ -325,7 +322,6 @@ public class ListView_Adapter extends BaseAdapter {
                 Log.i("status",status);
                 Log.i("currentTemp",currentTemp);
                 Log.i("desiredTemp",desiredTemp);
-                Log.i("heatingtime",heatingtime);
                 Log.i("serialNum",serialNum);
                 Log.i("roomName",roomNum);
 
