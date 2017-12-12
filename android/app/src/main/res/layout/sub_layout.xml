@@ -132,7 +132,8 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tv_desiredTemp"
-            android:layout_toRightOf="@+id/tv_CurrentD"/>
+            android:layout_toRightOf="@+id/tv_CurrentD"
+            android:layout_marginLeft="10dp"/>
 
         <Button
             android:id="@+id/btn_up"

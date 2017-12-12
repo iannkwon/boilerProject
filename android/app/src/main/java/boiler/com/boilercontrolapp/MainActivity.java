@@ -1,7 +1,6 @@
 package boiler.com.boilercontrolapp;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.AsyncTask;
@@ -11,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -35,8 +35,6 @@ import java.security.SecureRandom;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -71,15 +69,9 @@ public class MainActivity extends AppCompatActivity {
     String link_addDevice = "https://dsrc.co.kr/user/add_device"; // 새 보일러 등록
     String link_set = "https://dsrc.co.kr/manage/set?=";        // 상태 전송
 
-    String heatingMode;    // 난방 전원 값
-    String outGoingMode;    // 외출 모드 값
-    String currentTemp;     // 현재 온도 값
     String desiredTemp;      // 희망 온도 값
-    String heatingtime;     // 시간
     String serialNum;       // 제품 시리얼 번호
-    String operationMode;
-    String status;
-    String roomNum;        // 방 이름
+    String operationMode;   // 작동 모드
     String roomName;        // 방 이름
 
     String[] operationMode2 = new String[8];   // 작동 모드
@@ -90,11 +82,11 @@ public class MainActivity extends AppCompatActivity {
     String[] roomName2 = new String[8];        // 방 이름
     String[] status2 = new String[8];        // 상태
 
-    double count;
-    int dataLength;
-    int desireAvg;
-    String token;
-    String signature;
+    double count;       // 온도 증감
+    int dataLength;     // 데이터 길이
+    int desireAvg;      // 희망온도 평균
+    String token;       // 토근 값
+    String signature;   // 시그니처
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
         // 서버에서 데이터 받아오기
         getHeatingInfo();
         // 일정 간격 새로고침
-//        refresh();
+        refresh();
 
     }
     private Timer timer;
@@ -143,12 +135,11 @@ public class MainActivity extends AppCompatActivity {
 
                                 getHeatingInfo();           // 정보 요청
                                 Log.i("Refresh","OK");
-
                             }
                         });
                     }
                 };
-                timer.schedule(timerTask, 1000, 60000);    // 30초 후부터 30초 마다
+                timer.schedule(timerTask, 60000, 60000);    // 60초 후부터 60초 마다
             }
     // 액티비티 스탑시 타이머 정지
     @Override
@@ -239,7 +230,6 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("result>>",result);
                     Log.i("getHeatingInfo","OK");
                     listResult(result);
-//                    heatingReceive(result); // 서버로 부터 받은 값 정리
                 }else {
 //                    Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                 }
@@ -270,7 +260,6 @@ public class MainActivity extends AppCompatActivity {
             String[] device_id= new String[bLength];
             String[] room_range = new String[bLength];
             for(int i=1 ; i<=b.length/4 ; i++){
-//                Log.i("object"+i,b[i]);
                 device_id[i] = b[i*4-2];
                 room_range[i] = b[i*4];
                 Log.i("deviceID>>"+i,device_id[i]);
@@ -282,12 +271,12 @@ public class MainActivity extends AppCompatActivity {
         }catch (JSONException e){
             e.printStackTrace();
         }
+
     }
     // 요청한 디바이스 정보 방 번호 입력해서 상태 얻어오기
     ArrayList<String> arrayList = new ArrayList<String>();
     private void requestStatus(String[] device_id, String[] room_range){
         for (int i=1 ; i <= dataLength ; i++) {
-
             class GetLogData extends AsyncTask<String, Void, String> {
 
                 @Override
@@ -319,7 +308,6 @@ public class MainActivity extends AppCompatActivity {
                             con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
                             con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
 
-//                            con.setRequestMethod("POST");
                             con.setUseCaches(false);
                             con.setDoOutput(true);
                             con.setDoInput(true);
@@ -347,7 +335,6 @@ public class MainActivity extends AppCompatActivity {
                         super.onPostExecute(result);
                         if (result != null) {
                             arrayList.add(result);
-
                             if (arrayList.size() == dataLength){
                                 heatingReceive();
                                 Log.i("Array>>>",arrayList.toString());
@@ -367,6 +354,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Log.i("Array>>>",arrayList.toString());
             JSONArray jarray = new JSONArray(arrayList.toString());
+            desireAvg = 0;
             for(int i=0 ; i <arrayList.size() ; i++){
                 JSONObject jobj = jarray.getJSONObject(i);
                 JSONObject jobj2 = new JSONObject(jobj.getString("data"));
@@ -380,6 +368,8 @@ public class MainActivity extends AppCompatActivity {
                 if (desiredTemp2[i].equals("null")){
                     desiredTemp2[i] = currentTemp2[i];
                 }
+                //현재 온도값 더해서 평균내기
+                desireAvg += Double.parseDouble(currentTemp2[i]);
 
                 Log.i("desiredTemp_"+i,desiredTemp2[i]);
                 Log.i("Current_"+i,currentTemp2[i]);
@@ -390,6 +380,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("status_"+i,status2[i]);
             }
             setAdapter();
+            Log.i("DesiredAVG>>>",Double.toString(desireAvg));
 
         }catch (JSONException e){
             e.printStackTrace();
@@ -412,7 +403,60 @@ public class MainActivity extends AppCompatActivity {
                     roomNum2[i]);
             adapter.notifyDataSetChanged();
         }
+        adapter.notifyDataSetChanged();
         listView.setAdapter(adapter);
+        // 롱클릭 이벤트
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(final AdapterView<?> adapterView, View view, int i, long l) {
+                ((ListView_item) adapter.getItem(i)).getSerialNum();
+                serialNum = ((ListView_item) adapter.getItem(i)).getSerialNum().toString();
+                Log.i("SerialNum",serialNum);
+                final String[] abList = {"Modify"};
+                AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
+                ab.setItems(abList, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        switch (abList[i]){
+                            case "Modify":
+                                final EditText nameUpdate = new EditText(MainActivity.this);
+
+//                                       AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this);
+                                AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
+                                abMod.setTitle("Room Name Modify");
+                                abMod.setView(nameUpdate);
+                                abMod.setPositiveButton("modify", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        roomName = nameUpdate.getText().toString();
+                                        Log.i("roomName",roomName);
+                                        Log.i("SerialNum",serialNum);
+
+                                        SessionNow.setSession(MainActivity.this, serialNum, roomName);
+
+                                        Log.i("getSession>>>",SessionNow.getSession(MainActivity.this,serialNum));
+                                        getHeatingInfo();
+                                        Toast.makeText(getApplicationContext(), "Modify Successed", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                abMod.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                                    }
+                                });
+                                abMod.show();
+                                break;
+                        }
+                    }
+                });
+                ab.show();
+
+                return true;
+            }
+        });
+        //arrayList 클리어
+        arrayList.clear();
     }
 
     private void buttonSetting() {
@@ -426,14 +470,14 @@ public class MainActivity extends AppCompatActivity {
                     sw_allHeatingPower.setChecked(true);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     desiredTemp_text.setVisibility(View.VISIBLE);
-                    iv_warm.setImageResource(R.drawable.wariming);
+                    iv_warm.setImageResource(R.drawable.fire);
                     Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
                     if (sw_allOutgoingMode.isChecked()){
                         sw_allOutgoingMode.setChecked(false);
                     }
                     Log.i("avg",Integer.toString(desireAvg));
                     // 각 현재온도의 평균
-//                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
+                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
                     count = Double.parseDouble(tv_desiredTemp.getText().toString());
                 }else {
                     sw_allHeatingPower.setChecked(false);
@@ -522,8 +566,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 Log.i("getSession>>>",SessionNow.getSession(context,serialNum));
                                 if ( !serialNum.equals("") && !roomName.equals("")) {
-                                    //                                    Toast.makeText(getApplicationContext(), "Add Room", Toast.LENGTH_SHORT).show();
-                                    if (dataLength < 7){
+                                    if (dataLength < 8){
                                         // 제품 추가
                                         addDevice();
                                         Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
@@ -578,7 +621,6 @@ public class MainActivity extends AppCompatActivity {
                     con.setRequestProperty("Cookie", "token=" + token + ";" + "signature=" + signature);
                     con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded; cahrset=utf-8");
 
-//                            con.setRequestMethod("POST");
                     con.setUseCaches(false);
                     con.setDoOutput(true);
                     con.setDoInput(true);
@@ -622,8 +664,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                getInfo(); // 정보 가져오기
-                insertDo();
                 new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme)
                         .setTitle("All Control")
                         .setMessage("Are you All Control?")
@@ -635,13 +675,17 @@ public class MainActivity extends AppCompatActivity {
                                 getInfo(); // 정보 가져오기
 
                                 // 데이터 전송
-                                if (!desiredTemp.equals("") && !heatingtime.equals("") )
+                                if (!desiredTemp.equals("")  )
                                 {
                                     insertDo();     // 값 전송
-//                                    getHeatingInfo(); // 값 반영
+                                    getHeatingInfo(); // 값 반영
+
                                 } else{
                                     Toast.makeText(getApplicationContext(),"Heating Off.",Toast.LENGTH_SHORT).show();
                                 }
+
+
+
                             }
                         })
                         .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
@@ -656,10 +700,10 @@ public class MainActivity extends AppCompatActivity {
 
     // 등록된 모든 보일러 서버에 값 전송
     private void insertDo() {
-        Log.i("dataLength>>>", Integer.toString(dataLength));
-        for (int i = 1; i <= dataLength; i++) {
-            Log.i("SerialNum>>>"+i, serialNum2[i]);
-            Log.i("roomNum>>>"+i, roomNum2[i]);
+        Log.i("AllCon dataLength>>>", Integer.toString(dataLength));
+        for (int i = 0; i < dataLength; i++) {
+            Log.i("AllCon SerialNum>>>"+i, serialNum2[i]);
+            Log.i("AllCon roomNum>>>"+i, roomNum2[i]);
             class InsertData extends AsyncTask<String, Void, String> {
 
                 @Override
@@ -676,7 +720,6 @@ public class MainActivity extends AppCompatActivity {
                         datas += "&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
                         datas += "&desired_temp=" + URLEncoder.encode(desiredTemp2, "UTF-8");
                         datas += "&operation_mode=" + URLEncoder.encode(operation_mode2, "UTF-8");
-//                        data += "&status=" + URLEncoder.encode(status2, "UTF-8");
 
                         Log.i("test",datas);
 
@@ -733,25 +776,16 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 protected void onPostExecute(String result) {
-//                    super.onPostExecute(result);
                     Log.i("Allcontrol Result>>>", result);
                 }
             }//insertData
             InsertData task = new InsertData();
-            task.execute(link_set, serialNum2[i], roomNum2[i]);
+            task.execute(link_set, serialNum2[i], roomNum2[i],desiredTemp,operationMode);
         } //end insertDo
     }
 
     // 안드로이드 입력 정보 가져오기
     private void getInfo(){
-        // 현재 시간 가져오기
-        long rNow = System.currentTimeMillis();
-        // 현재 시간을 date변수에 저장한다.
-        Date date = new Date(rNow);
-        // 시간을 나타낼 포맷을 정한다 (yyyy/MM/dd 같은 형태로 변형 가능)
-        java.text.SimpleDateFormat sdfNow = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        // nowDate 변수에 값을 저장한다
-        heatingtime = sdfNow.format(date);
         // 희망 온도 가져오기
         desiredTemp = tv_desiredTemp.getText().toString();
         // 방 이름 가져오기
