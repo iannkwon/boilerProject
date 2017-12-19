@@ -47,7 +47,7 @@ public class ListView_Adapter extends BaseAdapter {
     // ListView 내부 View들을 가르킬 변수
     private TextView tv_roomName;
     private Switch sw_heatingPower;
-    private Switch sw_outgoingMode;
+    private Button btn_Mode;
     private TextView tv_currentTemp;
     private TextView tv_desiredTemp;
     private TextView tv_desiredTempText;
@@ -115,7 +115,7 @@ public class ListView_Adapter extends BaseAdapter {
 
         tv_roomName = (TextView) convertView.findViewById(R.id.tv_roomName);
         sw_heatingPower = (Switch) convertView.findViewById(R.id.sw_HeatingPower);
-        sw_outgoingMode = (Switch) convertView.findViewById(R.id.sw_OutgoingMode);
+        btn_Mode = (Button) convertView.findViewById(R.id.btn_Mode);
         tv_currentTemp = (TextView) convertView.findViewById(R.id.tv_CurrentTemp);
         tv_desiredTemp = (TextView) convertView.findViewById(R.id.tv_desiredTemp);
         tv_desiredTempText = (TextView)convertView.findViewById(R.id.desiredTemp);
@@ -146,115 +146,90 @@ public class ListView_Adapter extends BaseAdapter {
             // 데이터가 있다면 갖고 있는 정보를 뷰에 알맞게 배치
 
             // 난방 스위치
-            if (((ListView_item) getItem(position)).getOperationMode() == 1 ) {
+            if (((ListView_item) getItem(position)).getStatus() == 1) {
                 sw_heatingPower.setChecked(true);
+                btn_Mode.setVisibility(View.VISIBLE);
                 tv_desiredTemp.setVisibility(View.VISIBLE);
                 tv_desiredTempText.setVisibility(View.VISIBLE);
                 tv_desired.setVisibility(View.VISIBLE);
                 notifyDataSetChanged();
-                if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp()){
+                if (((ListView_item) getItem(position)).getOperationMode() == 1 &&
+                        ((ListView_item) getItem(position)).getCurrentTemp() <
+                                ((ListView_item) getItem(position)).getDesiredTemp()) {
                     iv_warm.setImageResource(R.drawable.fire);
-                    ((ListView_item) getItem(position)).setStatus(1);
-                    notifyDataSetChanged();
-                }else{
-                    ((ListView_item) getItem(position)).setStatus(0);
                     notifyDataSetChanged();
                 }
-            } else if(((ListView_item) getItem(position)).getOperationMode() != 1) {
+            } else if (((ListView_item) getItem(position)).getStatus() == 0) {
                 sw_heatingPower.setChecked(false);
-                notifyDataSetChanged();
-            }
-            // 외출 스위치
-            if (((ListView_item) getItem(position)).getOperationMode() == 2 ){
-                sw_outgoingMode.setChecked(true);
-                tv_desiredTemp.setVisibility(View.VISIBLE);
-                tv_desiredTempText.setVisibility(View.VISIBLE);
-                tv_desired.setVisibility(View.VISIBLE);
-                iv_warm.setImageResource(R.drawable.goingout);
-                notifyDataSetChanged();
-                if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp()){
-                    ((ListView_item) getItem(position)).setStatus(1);
-                    notifyDataSetChanged();
-                }else {
-                    ((ListView_item) getItem(position)).setStatus(0);
-                    notifyDataSetChanged();
-                }
-            } else if (((ListView_item) getItem(position)).getOperationMode() != 2){
-                sw_outgoingMode.setChecked(false);
+                btn_Mode.setVisibility(View.INVISIBLE);
+                tv_desiredTemp.setVisibility(View.INVISIBLE);
+                tv_desiredTempText.setVisibility(View.INVISIBLE);
+                tv_desired.setVisibility(View.INVISIBLE);
                 notifyDataSetChanged();
             }
         }
-
-        // 난방 전원 스위치
-        sw_heatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if ( b ){
-                    ((ListView_item) getItem(position)).setOperationMode(1);
-                    ((ListView_item) getItem(position)).setStatus(0);
-                    ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
-                    count = ((ListView_item) getItem(position)).getDesiredTemp();
-                    ((ListView_item) getItem(position)).getDesiredTemp();
-                    tv_desiredTemp.setVisibility(View.VISIBLE);
-                    tv_desiredTempText.setVisibility(View.VISIBLE);
-                    tv_desired.setVisibility(View.VISIBLE);
-                    notifyDataSetChanged();
-                     if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp() ){
-                    ((ListView_item) getItem(position)).setStatus(1);
-                    notifyDataSetChanged();
-                    }else{
-                         ((ListView_item) getItem(position)).setStatus(0);
-                         notifyDataSetChanged();
-                     }
-                    Log.i("getOperationMode value1",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
-                    Log.i("getStatus value1",Integer.toString(((ListView_item) getItem(position)).getStatus()));
-                }
-                else {
-                    ((ListView_item) getItem(position)).setOperationMode(2);
-                    ((ListView_item) getItem(position)).setIcon(0);
-                    ((ListView_item) getItem(position)).setDesiredTemp(18);
-                    notifyDataSetChanged();
-                    Log.i("getOperationMode value2",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
-                    Log.i("getStatus value2",Integer.toString(((ListView_item) getItem(position)).getStatus()));
-                }
+            if ( ((ListView_item) getItem(position)).getOperationMode() == 1 ){
+                btn_Mode.setText("Indoor");
+            }else if( ((ListView_item) getItem(position)).getOperationMode() == 3 ){
+                btn_Mode.setText("Outgoing");
             }
-        });
 
-        // 외출 모드 스위치
-        sw_outgoingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if ( b ){
-                    ((ListView_item) getItem(position)).setOperationMode(2);
-                    ((ListView_item) getItem(position)).getDesiredTemp();
-                    // 외출 스위치 On시 18도로 하기
-                    ((ListView_item) getItem(position)).setDesiredTemp(18);
-                    count = ((ListView_item) getItem(position)).getDesiredTemp();
-                    tv_desiredTemp.setVisibility(View.VISIBLE);
-                    tv_desiredTempText.setVisibility(View.VISIBLE);
-                    tv_desired.setVisibility(View.VISIBLE);
-                    ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
-                    notifyDataSetChanged();
-
-                    if ( ((ListView_item) getItem(position)).getCurrentTemp() < ((ListView_item) getItem(position)).getDesiredTemp() ){
+            sw_heatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                    if (b){
                         ((ListView_item) getItem(position)).setStatus(1);
+                        ((ListView_item) getItem(position)).getDesiredTemp();
+                        btn_Mode.setVisibility(View.VISIBLE);
+                        tv_desiredTemp.setVisibility(View.VISIBLE);
+                        tv_desiredTempText.setVisibility(View.VISIBLE);
+                        tv_desired.setVisibility(View.VISIBLE);
                         notifyDataSetChanged();
-                    }else{
+                        if ( ((ListView_item) getItem(position)).getOperationMode() == 1 ){
+                            btn_Mode.setText("Indoor");
+                            notifyDataSetChanged();
+                        }else if ( ((ListView_item) getItem(position)).getOperationMode() == 3){
+                            btn_Mode.setText("Outgoing");
+                            ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
+                            notifyDataSetChanged();
+                        }
+                        Log.i("Status>>>", Integer.toString( ((ListView_item) getItem(position)).getStatus()));
+
+                    } else{
                         ((ListView_item) getItem(position)).setStatus(0);
+                        ((ListView_item) getItem(position)).setIcon(0);
+                        btn_Mode.setVisibility(View.INVISIBLE);
+                        tv_desiredTemp.setVisibility(View.INVISIBLE);
+                        tv_desiredTempText.setVisibility(View.INVISIBLE);
+                        tv_desired.setVisibility(View.INVISIBLE);
+                        Log.i("Status>>>", Integer.toString( ((ListView_item) getItem(position)).getStatus()));
                         notifyDataSetChanged();
                     }
-                    Log.i("getOperationMode value3",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
-                    Log.i("getStatus value3",Integer.toString(((ListView_item) getItem(position)).getStatus()));
+
                 }
-                else {
-                    ((ListView_item) getItem(position)).setOperationMode(1);
-                    ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
+            });
+
+            btn_Mode.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.i("btn_Mode","Click");
+                    if( ((ListView_item) getItem(position)).getOperationMode() == 1) {
+                        ((ListView_item) getItem(position)).setOperationMode(3);
+                        ((ListView_item) getItem(position)).setIcon(R.drawable.goingout);
+                        ((ListView_item) getItem(position)).setDesiredTemp(18);
+                        btn_Mode.setText("Outgoing");
+                        Log.i("Opearation",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
+                    }else if (((ListView_item) getItem(position)).getOperationMode() == 3) {
+                        ((ListView_item) getItem(position)).setOperationMode(1);
+                        ((ListView_item) getItem(position)).setDesiredTemp(((ListView_item) getItem(position)).getCurrentTemp());
+                        ((ListView_item) getItem(position)).setIcon(0);
+                        btn_Mode.setText("Indoor");
+                        Log.i("Opearation",Integer.toString(((ListView_item) getItem(position)).getOperationMode()) );
+                    }
                     notifyDataSetChanged();
-                    Log.i("getOperationMode value4",Integer.toString(((ListView_item) getItem(position)).getOperationMode()));
-                    Log.i("getStatus value4",Integer.toString(((ListView_item) getItem(position)).getStatus()));
                 }
-            }
-        });
+            });
+
 
         count = ((ListView_item) getItem(position)).getDesiredTemp();
         // 각 아이템 상승 버튼 클릭
@@ -264,7 +239,7 @@ public class ListView_Adapter extends BaseAdapter {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
                 if (count < 45 && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
-                        ((ListView_item) getItem(position)).getOperationMode()==2 ) ) { // 온도 45도 이하일 때
+                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
                     count+=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도 올리기
@@ -273,7 +248,7 @@ public class ListView_Adapter extends BaseAdapter {
 
                     if (((ListView_item) getItem(position)).getOperationMode()== 1 &&((ListView_item) getItem(position)).getCurrentTemp() < count){
                         ((ListView_item) getItem(position)).setIcon(R.drawable.wariming);
-                        ((ListView_item) getItem(position)).setStatus(1);
+//                        ((ListView_item) getItem(position)).setStatus(1);
                         notifyDataSetChanged();
                     }
                     if (((ListView_item) getItem(position)).getOperationMode()== 3){
@@ -291,7 +266,7 @@ public class ListView_Adapter extends BaseAdapter {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
                 if (count > 10  && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
-                        ((ListView_item) getItem(position)).getOperationMode()==2 ) ) { // 온도 45도 이하일 때
+                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
                     count-=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도에 값 셋팅
@@ -300,7 +275,6 @@ public class ListView_Adapter extends BaseAdapter {
 
                     if (((ListView_item) getItem(position)).getOperationMode() == 1 && ((ListView_item) getItem(position)).getCurrentTemp() >= count){
                         ((ListView_item) getItem(position)).setIcon(0);
-                        ((ListView_item) getItem(position)).setStatus(0);
                         notifyDataSetChanged();
                     }
                 }
@@ -427,11 +401,9 @@ public class ListView_Adapter extends BaseAdapter {
             }
         }//insertData
         InsertData task = new InsertData();
-        if (operationMode == "0"){
-            task.execute(link_set,serialNum,roomNum,desiredTemp,status);
-        }else{
+
             task.execute(link_set,serialNum,roomNum,desiredTemp,operationMode,status);
-        }
+
 
     } //end insertDo
 

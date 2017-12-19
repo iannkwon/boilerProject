@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private ListView_Adapter adapter;
 
     Switch sw_allHeatingPower;
-    Switch sw_allOutgoingMode;
+    Button btn_Mode;
     TextView tv_desiredTemp;
     Button btn_up;
     Button btn_down;
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
     String link_addDevice = "https://dsrc.co.kr/user/add_device"; // 새 보일러 등록
     String link_set = "https://dsrc.co.kr/manage/set?=";        // 상태 전송
 
+    String status;
     String desiredTemp;      // 희망 온도 값
     String serialNum;       // 제품 시리얼 번호
     String operationMode;   // 작동 모드
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sw_allHeatingPower = (Switch) findViewById(R.id.sw_allHeatingPower);
-        sw_allOutgoingMode = (Switch) findViewById(R.id.sw_allOutgoingMode);
+        btn_Mode = (Button) findViewById(R.id.btn_Mode);
         tv_desiredTemp = (TextView) findViewById(R.id.tv_desiredTemp);
         btn_add = (Button) findViewById(R.id.btn_add);
         btn_up = (Button) findViewById(R.id.btn_up);
@@ -421,7 +422,6 @@ public class MainActivity extends AppCompatActivity {
                             case "Modify":
                                 final EditText nameUpdate = new EditText(MainActivity.this);
 
-//                                       AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this);
                                 AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                                 abMod.setTitle("Room Name Modify");
                                 abMod.setView(nameUpdate);
@@ -466,56 +466,56 @@ public class MainActivity extends AppCompatActivity {
         sw_allHeatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if (sw_allHeatingPower.isChecked()){
+                if (b){
                     sw_allHeatingPower.setChecked(true);
+                    status = "1";
+                    operationMode = "1";
+                    btn_Mode.setVisibility(View.VISIBLE);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     desiredTemp_text.setVisibility(View.VISIBLE);
                     iv_warm.setImageResource(R.drawable.fire);
                     Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
-                    if (sw_allOutgoingMode.isChecked()){
-                        sw_allOutgoingMode.setChecked(false);
-                    }
                     Log.i("avg",Integer.toString(desireAvg));
                     // 각 현재온도의 평균
                     tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
                     count = Double.parseDouble(tv_desiredTemp.getText().toString());
+                    Log.i("Sw_status",status);
                 }else {
                     sw_allHeatingPower.setChecked(false);
+                    status = "0";
+                    btn_Mode.setVisibility(View.INVISIBLE);
+                    tv_desiredTemp.setVisibility(View.INVISIBLE);
+                    desiredTemp_text.setVisibility(View.INVISIBLE);
+                    iv_warm.setImageResource(0);
                     Toast.makeText(MainActivity.this, "All Heating Off", Toast.LENGTH_SHORT).show();
-                    if (!sw_allOutgoingMode.isChecked()){
-                        tv_desiredTemp.setVisibility(View.INVISIBLE);
-                        desiredTemp_text.setVisibility(View.INVISIBLE);
-                        iv_warm.setImageResource(0);
-                    }
+                    Log.i("Sw_status",status);
+//                    }
                 }
             }
         });
-        sw_allOutgoingMode.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+        btn_Mode.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                // 전체 외출
-                if (sw_allOutgoingMode.isChecked()){
-                    sw_allOutgoingMode.setChecked(true);
-                    tv_desiredTemp.setVisibility(View.VISIBLE);
-                    desiredTemp_text.setVisibility(View.VISIBLE);
+            public void onClick(View view) {
+                Log.i("Main BtnMode",btn_Mode.getText().toString());
+
+                if ( operationMode == "1") {
+                    btn_Mode.setText("Outgoing");
                     iv_warm.setImageResource(R.drawable.goingout);
-                    tv_desiredTemp.setText("18");
-                    count = Double.parseDouble(tv_desiredTemp.getText().toString());
-                    Toast.makeText(MainActivity.this, "All OutgoingMode On", Toast.LENGTH_SHORT).show();
-                    if (sw_allHeatingPower.isChecked()){
-                        sw_allHeatingPower.setChecked(false);
-                    }
-                }else {
-                    sw_allOutgoingMode.setChecked(false);
-                    Toast.makeText(MainActivity.this, "All OutgoingMode Off", Toast.LENGTH_SHORT).show();
-                    if (!sw_allHeatingPower.isChecked()){
-                        tv_desiredTemp.setVisibility(View.INVISIBLE);
-                        desiredTemp_text.setVisibility(View.INVISIBLE);
-                        iv_warm.setImageResource(0);
-                    }
+                    operationMode = "3";
+                    tv_desiredTemp.setText("18.0");
+                    Log.i("OperationMode>>>",operationMode);
+
+                }else if (operationMode == "3"){
+                    btn_Mode.setText("Indoor");
+                    operationMode = "1";
+                    tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
+                    iv_warm.setImageResource(R.drawable.fire);
+                    Log.i("OperationMode>>>",operationMode);
                 }
             }
         });
+
         // 현재 온도값 가져오기
         count = Double.parseDouble(tv_desiredTemp.getText().toString());
         // 온도 상승 버튼
@@ -523,7 +523,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Log.i("tv_desired",tv_desiredTemp.getText().toString());
-                if (count <45 && (sw_allHeatingPower.isChecked() || sw_allOutgoingMode.isChecked() ) ) { // 온도 45도 이하일 때
+                if (count <45 && (sw_allHeatingPower.isChecked()) ) { // 온도 45도 이하일 때
                     count += 0.5;
                     tv_desiredTemp.setText("" + count);
                 }
@@ -714,12 +714,13 @@ public class MainActivity extends AppCompatActivity {
                         String room_number2 = params[2];
                         String desiredTemp2 = params[3];
                         String operation_mode2 = params[4];
-//                        String status2 = params[5];
+                        String status2 = params[5];
 
                         String datas = "device_id=" + URLEncoder.encode(device_id2, "UTF-8");
                         datas += "&room_number=" + URLEncoder.encode(room_number2, "UTF-8");
                         datas += "&desired_temp=" + URLEncoder.encode(desiredTemp2, "UTF-8");
                         datas += "&operation_mode=" + URLEncoder.encode(operation_mode2, "UTF-8");
+                        datas += "&status=" + URLEncoder.encode(status2, "UTF-8");
 
                         Log.i("test",datas);
 
@@ -780,7 +781,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }//insertData
             InsertData task = new InsertData();
-            task.execute(link_set, serialNum2[i], roomNum2[i],desiredTemp,operationMode);
+            task.execute(link_set, serialNum2[i], roomNum2[i],desiredTemp,operationMode,status);
         } //end insertDo
     }
 
@@ -794,15 +795,9 @@ public class MainActivity extends AppCompatActivity {
         serialNum = tv_serialNum.getText().toString();
         // 난방 스위치 값 스트링으로 변환
         if(sw_allHeatingPower.isChecked()){
-            operationMode = "1";
+            status = "1";
         }else {
-//            operationMode = "0";
-        }
-        // 외출모드 스위치 값 스트링으로 변환
-        if(sw_allOutgoingMode.isChecked()){
-            operationMode = "2";
-        }else {
-//            operationMode = "0";
+            status = "0";
         }
         Log.i("OperationMode",operationMode);
         Log.i("desiredTemp",desiredTemp);
