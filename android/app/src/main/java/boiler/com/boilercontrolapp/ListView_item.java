@@ -1,18 +1,20 @@
 package boiler.com.boilercontrolapp;
 
+import android.graphics.drawable.Drawable;
+import android.widget.ImageView;
+
 /**
  * Created by Owner on 2017-10-31.
  */
 
 public class ListView_item {
 
-    private int operationMode;
-    private int status;
+    private int heatingPower;
+    private int outgoingMode;
     private double currentTemp;
     private double desiredTemp;
     private String serialNum;
     private String roomName;
-    private String roomNum;
     private int icon;
 
     public String getRoomName() {
@@ -31,20 +33,20 @@ public class ListView_item {
         this.serialNum = serialNum;
     }
 
-    public int getOperationMode() {
-        return operationMode;
+    public int getHeatingPower() {
+        return heatingPower;
     }
 
-    public void setOperationMode(int operationMode) {
-        this.operationMode = operationMode;
+    public void setHeatingPower(int heatingPower) {
+        this.heatingPower = heatingPower;
     }
 
-    public int getStatus() {
-        return status;
+    public int getOutgoingMode() {
+        return outgoingMode;
     }
 
-    public void setStatus(int status) {
-        this.status = status;
+    public void setOutgoingMode(int outgoingMode) {
+        this.outgoingMode = outgoingMode;
     }
 
     public double getCurrentTemp() {
@@ -61,14 +63,6 @@ public class ListView_item {
 
     public void setDesiredTemp(double desiredTemp) {
         this.desiredTemp = desiredTemp;
-    }
-
-    public String getRoomNum() {
-        return roomNum;
-    }
-
-    public void setRoomNum(String roomNum) {
-        this.roomNum = roomNum;
     }
 
     public int getIcon() {

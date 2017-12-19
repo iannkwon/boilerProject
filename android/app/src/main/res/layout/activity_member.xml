@@ -46,16 +46,16 @@
 
 
     <EditText
-        android:id="@+id/et_phone"
-        android:layout_width="150dp"
+        android:id="@+id/et_nicName"
+        android:layout_width="100dp"
         android:layout_height="wrap_content"
-        android:hint="Phone Number"
+        android:hint="Nicname"
         android:textColorHint="#E5E2DB"
-        android:inputType="number"
+        android:inputType="text"
         android:textAlignment="center"
         android:textColor="#E5E2DB"
         android:maxLines="1"
-        android:maxLength="12"
+        android:maxLength="8"
         android:layout_gravity="center"
         android:layout_below="@+id/et_id"
         android:layout_centerHorizontal="true"/>
@@ -72,7 +72,7 @@
         android:maxLines="1"
         android:maxLength="12"
         android:layout_gravity="center"
-        android:layout_below="@+id/et_phone"
+        android:layout_below="@+id/et_nicName"
         android:layout_centerHorizontal="true"/>
 
     <EditText
@@ -89,6 +89,20 @@
         android:layout_gravity="center"
         android:layout_below="@+id/et_password"
         android:layout_centerHorizontal="true"/>
+    <EditText
+        android:id="@+id/et_serialNum"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:hint="Serial Number"
+        android:textColorHint="#E5E2DB"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textColor="#E5E2DB"
+        android:maxLines="1"
+        android:maxLength="10"
+        android:layout_gravity="center"
+        android:layout_below="@+id/et_password2"
+        android:layout_centerHorizontal="true"/>
     <Button
         android:id="@+id/btn_ok"
         android:layout_width="wrap_content"
@@ -98,7 +112,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
         android:background="#A50821"
-        android:layout_below="@+id/et_password2"
+        android:layout_below="@+id/et_serialNum"
         android:layout_centerHorizontal="true"/>
 </RelativeLayout>
     </ScrollView>
