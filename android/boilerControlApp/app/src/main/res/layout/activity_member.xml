@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="boiler.com.boilercontrolapp.MemberActivity"
+    android:orientation="vertical"
+    android:background="#FC523D"
+    android:id="@+id/layout2">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+<RelativeLayout
+    android:id="@+id/Rlayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/tv_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sign Up"
+        android:textStyle="bold"
+        android:textColor="#E5E2DB"
+        android:textAlignment="center"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+
+        android:textSize="40dp" />
+    <EditText
+        android:id="@+id/et_id"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:hint="ID"
+        android:textColorHint="#E5E2DB"
+        android:inputType="text"
+        android:textAlignment="center"
+        android:textColor="#E5E2DB"
+        android:maxLines="1"
+        android:maxLength="10"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"
+        android:layout_below="@+id/tv_title"
+        android:layout_centerHorizontal="true"/>
+
+
+    <EditText
+        android:id="@+id/et_phone"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:hint="Phone Number"
+        android:textColorHint="#E5E2DB"
+        android:inputType="number"
+        android:textAlignment="center"
+        android:textColor="#E5E2DB"
+        android:maxLines="1"
+        android:maxLength="12"
+        android:layout_gravity="center"
+        android:layout_below="@+id/et_id"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/et_password"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:hint="Password"
+        android:textColorHint="#E5E2DB"
+        android:inputType="textPassword"
+        android:textAlignment="center"
+        android:textColor="#E5E2DB"
+        android:maxLines="1"
+        android:maxLength="12"
+        android:layout_gravity="center"
+        android:layout_below="@+id/et_phone"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/et_password2"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:hint="Password OK"
+        android:textColorHint="#E5E2DB"
+        android:inputType="textPassword"
+        android:textAlignment="center"
+        android:textColor="#E5E2DB"
+        android:maxLines="1"
+        android:maxLength="12"
+        android:layout_gravity="center"
+        android:layout_below="@+id/et_password"
+        android:layout_centerHorizontal="true"/>
+    <Button
+        android:id="@+id/btn_ok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OK"
+        android:textColor="#E5E2DB"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:background="#A50821"
+        android:layout_below="@+id/et_password2"
+        android:layout_centerHorizontal="true"/>
+</RelativeLayout>
+    </ScrollView>
+
+</LinearLayout>
