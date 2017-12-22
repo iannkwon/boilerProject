@@ -15,21 +15,20 @@
         android:descendantFocusability="blocksDescendants"
         >
 
-        <TextView
+        <ImageView
             android:id="@+id/tv_HeatingPower"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="POW"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_marginTop="10dp"
             android:layout_marginLeft="5dp"
-            android:textColor="#B06457"/>
+            android:src="@drawable/power"/>
 
         <Switch
             android:id="@+id/sw_HeatingPower"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_HeatingPower"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp"
             android:track="@drawable/switch_track_selector"
             android:thumb="@drawable/switch_thumb_selector"
@@ -44,7 +43,7 @@
             android:layout_marginTop="25dp"
             android:layout_marginLeft="5dp"
             android:text=""
-            android:textColor="#B06457"/>
+            android:textColor="#B06457" />
 
         <Button
             android:id="@+id/btn_Mode"
@@ -66,21 +65,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/sw_HeatingPower"
-            android:layout_marginLeft="30dp"
+            android:layout_marginLeft="15dp"
             android:text="Current"
             android:textColor="#B06457"
+            android:textSize="13sp"
             android:textOn=""
             android:textOff=""/>
 
         <TextView
             android:id="@+id/tv_CurrentTemp"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="45dp"
             android:layout_below="@+id/desiredTemp"
             android:layout_toRightOf="@+id/btn_Mode"
             android:layout_marginLeft="3dp"
-            android:text="0"
-            android:textSize="30dp"
+            android:text="18.0"
+            android:textSize="25sp"
             android:textStyle="bold"
             android:textAlignment="gravity"
             android:textColor="#B06457"/>
@@ -88,11 +88,11 @@
         <TextView
             android:id="@+id/tv_CurrentD"
             android:layout_width="25dp"
-            android:layout_height="50dp"
+            android:layout_height="30dp"
             android:layout_toRightOf="@+id/tv_CurrentTemp"
             android:layout_below="@+id/tv_Current"
             android:text="℃"
-            android:textSize="30dp"
+            android:textSize="15sp"
             android:textColor="#B06457"/>
 
         <TextView
@@ -102,20 +102,20 @@
             android:layout_toRightOf="@+id/tv_CurrentD"
             android:layout_marginLeft="10dp"
             android:text="Setting"
+            android:textSize="13sp"
             android:textColor="#B06457"/>
 
         <TextView
             android:id="@+id/tv_desiredTemp"
-            android:layout_width="70dp"
+            android:layout_width="wrap_content"
             android:layout_height="35dp"
+            android:layout_alignStart="@+id/desiredTemp"
             android:layout_below="@+id/desiredTemp"
-            android:layout_toRightOf="@+id/tv_CurrentD"
-            android:layout_marginLeft="10dp"
-            android:text="0"
+            android:text="10.0"
             android:textAlignment="gravity"
-            android:textSize="30dp"
             android:textColor="#B06457"
-            android:textStyle="bold"/>
+            android:textSize="25sp"
+            android:textStyle="bold" />
 
         <TextView
             android:id="@+id/tv_desired"
@@ -124,15 +124,15 @@
             android:layout_toRightOf="@+id/tv_desiredTemp"
             android:layout_below="@+id/desiredTemp"
             android:text="℃"
-            android:textSize="30dp"
+            android:textSize="15sp"
             android:textColor="#B06457"/>
         <ImageView
             android:id="@+id/iv_warm"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tv_desiredTemp"
-            android:layout_toRightOf="@+id/tv_CurrentD"
-            android:layout_marginLeft="10dp"/>
+            android:layout_toRightOf="@+id/tv_roomName"
+            android:layout_marginLeft="6dp"/>
 
         <Button
             android:id="@+id/btn_up"
@@ -140,9 +140,9 @@
             android:layout_height="30dp"
             android:layout_toRightOf="@+id/tv_desired"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="10dp"
             android:textColor="#B06457"
             android:text="▲"
+            android:textSize="20sp"
             android:background="#F9C4A4"
             />
 
@@ -151,39 +151,49 @@
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:layout_alignBottom="@+id/btn_Mode"
-            android:layout_toStartOf="@+id/btn_save"
+            android:layout_toRightOf="@+id/tv_desired"
+            android:layout_marginBottom="10dp"
             android:background="#F9C4A4"
             android:text="▼"
+            android:textSize="20sp"
             android:textColor="#B06457" />
 
 
 
         <Button
             android:id="@+id/btn_save"
-            android:layout_width="40dp"
+            android:layout_width="80dp"
             android:layout_height="40dp"
             android:layout_toRightOf="@+id/btn_up"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="20dp"
+            android:layout_centerVertical="true"
+            android:layout_alignParentEnd="false"
             android:textColor="#B06457"
             android:text="OK"
+            android:textSize="15sp"
             android:background="#F9C4A4"/>
 
         <TextView
             android:id="@+id/tv_roomName"
-            android:layout_width="wrap_content"
+            android:layout_width="80dp"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_CurrentTemp"
             android:layout_toRightOf="@+id/btn_Mode"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="6dp"
             android:text="Room1"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:textStyle="bold"
             android:textColor="#FC523D"
-            android:maxLength="15"
+            android:maxLength="9"
             android:maxLines="1"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:layout_alignParentEnd="true"/>
+
     </RelativeLayout>
 
 </RelativeLayout>

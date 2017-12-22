@@ -3,11 +3,16 @@ package boiler.com.boilercontrolapp;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.text.InputFilter;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -56,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
     Button btn_up;
     Button btn_down;
     Button btn_save;
-    Button btn_add;
     TextView tv_name;
     TextView tv_serialNum;
     TextView tv_nicName;
     TextView desiredTemp_text;
+    TextView tv_desired;
     ImageView iv_warm;
     RelativeLayout Rlayout;
 
@@ -89,6 +94,31 @@ public class MainActivity extends AppCompatActivity {
     String token;       // 토근 값
     String signature;   // 시그니처
 
+    // 액션 오버 플로우 메뉴
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_list, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.action_device:
+                deviceMenu();
+                return true;
+            case R.id.action_setting:
+                Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
+                return true;
+            case  R.id.action_refresh:
+                getHeatingInfo();
+                return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,7 +127,6 @@ public class MainActivity extends AppCompatActivity {
         sw_allHeatingPower = (Switch) findViewById(R.id.sw_allHeatingPower);
         btn_Mode = (Button) findViewById(R.id.btn_Mode);
         tv_desiredTemp = (TextView) findViewById(R.id.tv_desiredTemp);
-        btn_add = (Button) findViewById(R.id.btn_add);
         btn_up = (Button) findViewById(R.id.btn_up);
         btn_down = (Button) findViewById(R.id.btn_down);
         btn_save = (Button) findViewById(R.id.btn_save);
@@ -108,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.container);
         Rlayout = (RelativeLayout)findViewById(R.id.Rlayout);
         iv_warm = (ImageView)findViewById(R.id.iv_warm);
+        tv_desired = (TextView)findViewById(R.id.tv_desired);
         //저장된 토큰값 출력
         showtoken();
         // 버튼 설정
@@ -117,66 +147,66 @@ public class MainActivity extends AppCompatActivity {
         // 서버에서 데이터 받아오기
         getHeatingInfo();
         // 일정 간격 새로고침
-        refresh();
+//        refresh();
 
     }
-    private Timer timer;
-    private TimerTask timerTask;
-
-    // 일정 간격마다 새로고침
-    private void refresh(){
-                timer = new Timer();
-                timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-
-                        MainActivity.this.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-
-                                getHeatingInfo();           // 정보 요청
-                                Log.i("Refresh","OK");
-                            }
-                        });
-                    }
-                };
-                timer.schedule(timerTask, 60000, 60000);    // 60초 후부터 60초 마다
-            }
-    // 액티비티 스탑시 타이머 정지
-    @Override
-    protected void onStop() {
-        super.onStop();
-        if (timerTask != null){
-            timerTask.cancel();
-            timerTask=null;
-        }
-        if (timer != null){
-            timer.cancel();
-            timer.purge();
-            timer = null;
-        }
-    }
-    // Restart
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        refresh();
-    }
-    // 액티비티 종료시 타이머 정지
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        if (timerTask != null){
-            timerTask.cancel();
-            timerTask=null;
-        }
-        if (timer != null){
-            timer.cancel();
-            timer.purge();
-            timer = null;
-        }
-    }
+//    private Timer timer;
+//    private TimerTask timerTask;
+//
+//    // 일정 간격마다 새로고침
+//    private void refresh(){
+//                timer = new Timer();
+//                timerTask = new TimerTask() {
+//                    @Override
+//                    public void run() {
+//
+//                        MainActivity.this.runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//
+//                                getHeatingInfo();           // 정보 요청
+//                                Log.i("Refresh","OK");
+//                            }
+//                        });
+//                    }
+//                };
+//                timer.schedule(timerTask, 60000, 60000);    // 60초 후부터 60초 마다
+//            }
+//    // 액티비티 스탑시 타이머 정지
+//    @Override
+//    protected void onStop() {
+//        super.onStop();
+//        if (timerTask != null){
+//            timerTask.cancel();
+//            timerTask=null;
+//        }
+//        if (timer != null){
+//            timer.cancel();
+//            timer.purge();
+//            timer = null;
+//        }
+//    }
+//    // Restart
+//    @Override
+//    protected void onRestart() {
+//        super.onRestart();
+//        refresh();
+//    }
+//    // 액티비티 종료시 타이머 정지
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//
+//        if (timerTask != null){
+//            timerTask.cancel();
+//            timerTask=null;
+//        }
+//        if (timer != null){
+//            timer.cancel();
+//            timer.purge();
+//            timer = null;
+//        }
+//    }
 //     서버측에 난방 정보 요청
     public void getHeatingInfo() {
         class GetLogData extends AsyncTask<String, Void, String> {
@@ -413,7 +443,7 @@ public class MainActivity extends AppCompatActivity {
                 ((ListView_item) adapter.getItem(i)).getSerialNum();
                 serialNum = ((ListView_item) adapter.getItem(i)).getSerialNum().toString();
                 Log.i("SerialNum",serialNum);
-                final String[] abList = {"Modify"};
+                final String[] abList = {"Room Name Modify"};
                 AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this);
                 ab.setItems(abList, new DialogInterface.OnClickListener() {
                     @Override
@@ -421,6 +451,7 @@ public class MainActivity extends AppCompatActivity {
                         switch (abList[i]){
                             case "Modify":
                                 final EditText nameUpdate = new EditText(MainActivity.this);
+                                nameUpdate.setFilters(new InputFilter[]{new InputFilter.LengthFilter(8)}); // 글자수 제한
 
                                 AlertDialog.Builder abMod = new AlertDialog.Builder(MainActivity.this, R.style.AlertDialogTheme);
                                 abMod.setTitle("Room Name Modify");
@@ -462,6 +493,7 @@ public class MainActivity extends AppCompatActivity {
     private void buttonSetting() {
         tv_desiredTemp.setVisibility(View.INVISIBLE);
         desiredTemp_text.setVisibility(View.INVISIBLE);
+        tv_desired.setVisibility(View.INVISIBLE);
 
         sw_allHeatingPower.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -474,7 +506,8 @@ public class MainActivity extends AppCompatActivity {
                     btn_Mode.setVisibility(View.VISIBLE);
                     tv_desiredTemp.setVisibility(View.VISIBLE);
                     desiredTemp_text.setVisibility(View.VISIBLE);
-                    iv_warm.setImageResource(R.drawable.fire);
+                    tv_desired.setVisibility(View.VISIBLE);
+                    iv_warm.setImageResource(R.drawable.warming);
                     Toast.makeText(MainActivity.this, "All Heating On", Toast.LENGTH_SHORT).show();
                     Log.i("avg",Integer.toString(desireAvg));
                     // 각 현재온도의 평균
@@ -487,6 +520,7 @@ public class MainActivity extends AppCompatActivity {
                     btn_Mode.setVisibility(View.INVISIBLE);
                     tv_desiredTemp.setVisibility(View.INVISIBLE);
                     desiredTemp_text.setVisibility(View.INVISIBLE);
+                    tv_desired.setVisibility(View.INVISIBLE);
                     iv_warm.setImageResource(0);
                     Toast.makeText(MainActivity.this, "All Heating Off", Toast.LENGTH_SHORT).show();
                     Log.i("Sw_status",status);
@@ -511,7 +545,7 @@ public class MainActivity extends AppCompatActivity {
                     btn_Mode.setText("Indoor");
                     operationMode = "1";
                     tv_desiredTemp.setText(Double.toString(desireAvg/dataLength));
-                    iv_warm.setImageResource(R.drawable.fire);
+                    iv_warm.setImageResource(R.drawable.warming);
                     Log.i("OperationMode>>>",operationMode);
                 }
             }
@@ -541,57 +575,54 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // 장비 추가
-        btn_add.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme);
-                // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
-                final Context context = getApplicationContext();
-                LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
-                // 레이아웃 설정
-                View layout = inflater.inflate(R.layout.add_layout,
-                        (ViewGroup) findViewById(R.id.layout_add));
-                final EditText add_serialNum = (EditText) layout.findViewById(R.id.add_serialNum);
-                final EditText add_roomName = (EditText) layout.findViewById(R.id.add_roomName);
-                ab.setTitle("Add Room");
-                ab.setView(layout);
-                ab.setPositiveButton("OK",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                serialNum = add_serialNum.getText().toString();
-                                roomName = add_roomName.getText().toString();
 
-                                SessionNow.setSession(context, serialNum, roomName);
-
-                                Log.i("getSession>>>",SessionNow.getSession(context,serialNum));
-                                if ( !serialNum.equals("") && !roomName.equals("")) {
-                                    if (dataLength < 8){
-                                        // 제품 추가
-                                        addDevice();
-                                        Toast.makeText(getApplicationContext(), "Add Successed", Toast.LENGTH_SHORT).show();
-                                    }else{
-                                        Toast.makeText(getApplicationContext(), "Over Room, You can register up to 8 room", Toast.LENGTH_SHORT).show();
-                                    }
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
-                                }
-                                // 새로고침
-                                getHeatingInfo();
-                            }
-                        });
-                ab.setNegativeButton("CANCEL",
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                dialogInterface.cancel();
-                            }
-                        });
-                ab.show();
-            }
-        });
     }
+    private void deviceMenu(){
+        final AlertDialog.Builder ab = new AlertDialog.Builder(MainActivity.this,R.style.AlertDialogTheme);
+        // Context얻고 해당 컨텍스트의 레이아웃 정보 얻기
+        final Context context = getApplicationContext();
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(LAYOUT_INFLATER_SERVICE);
+        // 레이아웃 설정
+        View layout = inflater.inflate(R.layout.add_layout,
+                (ViewGroup) findViewById(R.id.layout_add));
+        final EditText add_serialNum = (EditText) layout.findViewById(R.id.add_serialNum);
+        final EditText add_roomName = (EditText) layout.findViewById(R.id.add_roomName);
+        ab.setTitle("Add Room");
+        ab.setView(layout);
+        ab.setPositiveButton("OK",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        serialNum = add_serialNum.getText().toString();
+                        roomName = add_roomName.getText().toString();
+
+                        SessionNow.setSession(context, serialNum, roomName);
+
+                        Log.i("getSession>>>",SessionNow.getSession(context,serialNum));
+                        if ( !serialNum.equals("") && !roomName.equals("")) {
+                            if (dataLength < 8){
+                                // 제품 추가
+                                addDevice();
+                            }else{
+                                Toast.makeText(getApplicationContext(), "Over Room, You can register up to 8 room", Toast.LENGTH_SHORT).show();
+                            }
+                        } else {
+                            Toast.makeText(getApplicationContext(), "No Value", Toast.LENGTH_SHORT).show();
+                        }
+                        // 새로고침
+                        getHeatingInfo();
+                    }
+                });
+        ab.setNegativeButton("CANCEL",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.cancel();
+                    }
+                });
+        ab.show();
+    }
+
     private void addDevice(){
         class GetLogData extends AsyncTask<String, Void, String> {
 
@@ -649,6 +680,16 @@ public class MainActivity extends AppCompatActivity {
                 super.onPostExecute(result);
                 if (result != null) {
                     Log.i("addResult",result);
+                    try {
+                        JSONObject jsonObject = new JSONObject(result);
+                        if(jsonObject.getString("result")=="false"){
+                            Toast.makeText(getApplicationContext(), "Wrong Serial Number",Toast.LENGTH_SHORT).show();
+                        }else if(jsonObject.getString("result")=="true"){
+                            Toast.makeText(getApplicationContext(), "Successed Add device",Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
                 } else {
                     Toast.makeText(getApplicationContext(),"Error",Toast.LENGTH_SHORT).show();
                 }
@@ -829,6 +870,7 @@ public class MainActivity extends AppCompatActivity {
     public void showtoken(){
         token= SessionNow.getSession(this,"token1");
         signature= SessionNow.getSession(this,"token2");
+        tv_nicName.setText("Welcome to "+SessionNow.getSession(this, "id"));
     }
     //저장된 토큰값 삭제
     private void deltoken(){

@@ -13,7 +13,6 @@ import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -156,7 +155,7 @@ public class ListView_Adapter extends BaseAdapter {
                 if (((ListView_item) getItem(position)).getOperationMode() == 1 &&
                         ((ListView_item) getItem(position)).getCurrentTemp() <
                                 ((ListView_item) getItem(position)).getDesiredTemp()) {
-                    iv_warm.setImageResource(R.drawable.fire);
+                    iv_warm.setImageResource(R.drawable.warming);
                     notifyDataSetChanged();
                 }else if( ((ListView_item) getItem(position)).getOperationMode() == 3 ){
                     iv_warm.setImageResource(R.drawable.goingout);
@@ -243,8 +242,7 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View v) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count < 45 && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
-                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
+                if (count < 45 && ( ((ListView_item) getItem(position)).getStatus() == 1 ) ) { // 온도 45도 이하일 때
                     count+=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도 올리기
@@ -252,7 +250,7 @@ public class ListView_Adapter extends BaseAdapter {
                     notifyDataSetChanged();
 
                     if (((ListView_item) getItem(position)).getOperationMode()== 1 &&((ListView_item) getItem(position)).getCurrentTemp() < count){
-                        ((ListView_item) getItem(position)).setIcon(R.drawable.wariming);
+                        ((ListView_item) getItem(position)).setIcon(R.drawable.warming);
 //                        ((ListView_item) getItem(position)).setStatus(1);
                         notifyDataSetChanged();
                     }
@@ -270,8 +268,7 @@ public class ListView_Adapter extends BaseAdapter {
             public void onClick(View view) {
                 // 각 아이템 희망온도 가져오기
                 count = ((ListView_item) getItem(position)).getDesiredTemp();
-                if (count > 10  && ( ((ListView_item) getItem(position)).getOperationMode()==1 ||
-                        ((ListView_item) getItem(position)).getOperationMode()==3 ) ) { // 온도 45도 이하일 때
+                if (count > 10  && ( ((ListView_item) getItem(position)).getStatus() == 1 ) ) { // 온도 45도 이하일 때
                     count-=0.5;
                     Log.i("count", Double.toString(count));
                     // 각 아이템 희망온도에 값 셋팅

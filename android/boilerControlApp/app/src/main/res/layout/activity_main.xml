@@ -14,22 +14,20 @@
         android:layout_height="wrap_content"
         android:background="#FC523D">
 
-        <TextView
+        <ImageView
             android:id="@+id/tv_allHeatingPower"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="POW"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
             android:layout_alignParentLeft="true"
             android:layout_margin="10dp"
-            android:textColor="#F0F0E6"
-            />
+           android:src="@drawable/power" />
 
         <Switch
             android:id="@+id/sw_allHeatingPower"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_allHeatingPower"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="1dp"
             android:layout_marginTop="10dp"
             android:track="@drawable/switch_track_selector"
             android:thumb="@drawable/switch_thumb_selector"
@@ -55,11 +53,11 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/tv_allOutgoingMode"
             android:layout_below="@+id/sw_allHeatingPower"
-            android:layout_marginLeft="13dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp"
             android:textStyle="bold"
             android:textColor="#F0F0E6"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:text="Indoor"
             android:visibility="invisible"
             android:background="#FF9973" />
@@ -69,38 +67,49 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@+id/sw_allHeatingPower"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="15dp"
+            android:textSize="15sp"
             android:text="Setting"
             android:textColor="#F0F0E6"/>
 
         <TextView
             android:id="@+id/tv_desiredTemp"
-            android:layout_width="60dp"
-            android:layout_height="30dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/desiredTemp"
             android:layout_toRightOf="@+id/btn_Mode"
             android:layout_marginLeft="11dp"
-            android:text="0"
-            android:textSize="25dp"
+            android:text="10.0"
+            android:textSize="25sp"
             android:textAlignment="gravity"
             android:textStyle="bold"
             android:textColor="#F0F0E6"
             />
+
+        <TextView
+            android:id="@+id/tv_desired"
+            android:layout_width="25dp"
+            android:layout_height="50dp"
+            android:layout_toRightOf="@+id/tv_desiredTemp"
+            android:layout_below="@+id/desiredTemp"
+            android:text="℃"
+            android:textSize="15dp"
+            android:textColor="#F0F0E6"/>
 
         <ImageView
             android:id="@+id/iv_warm"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_below="@+id/tv_desiredTemp"
-            android:layout_toRightOf="@+id/btn_Mode"/>
+            android:layout_toRightOf="@+id/btn_Mode"
+            android:layout_marginLeft="15dp"/>
 
         <Button
             android:id="@+id/btn_up"
             android:layout_width="20dp"
             android:layout_height="30dp"
-            android:layout_toRightOf="@+id/desiredTemp"
-            android:layout_marginLeft="25dp"
-            android:layout_marginTop="5dp"
+            android:layout_toRightOf="@+id/tv_desired"
+            android:layout_marginTop="14dp"
             android:text="▲"
             android:background="#FF9973"
             android:textColor="#F0F0E6"/>
@@ -108,9 +117,8 @@
             android:id="@+id/btn_down"
             android:layout_width="20dp"
             android:layout_height="30dp"
-            android:layout_toRightOf="@+id/desiredTemp"
+            android:layout_toRightOf="@+id/tv_desired"
             android:layout_below="@+id/btn_up"
-            android:layout_marginLeft="25dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
             android:text="▼"
@@ -125,6 +133,7 @@
             android:layout_marginLeft="15dp"
             android:layout_centerVertical="true"
             android:text="save"
+            android:textSize="15sp"
             android:textColor="#F0F0E6"
             android:background="#FF9973"/>
 
@@ -137,19 +146,10 @@
             android:layout_marginLeft="15dp"
             android:text=""
             android:textAlignment="center"
-            android:textSize="10dp"
+            android:textSize="10sp"
 
             android:textColor="#F0F0E6"/>
 
-        <Button
-            android:id="@+id/btn_add"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:text="+"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="#FF9973"
-            android:textColor="#F0F0E6"/>
 
         <TextView
             android:id="@+id/tv_serialNum"

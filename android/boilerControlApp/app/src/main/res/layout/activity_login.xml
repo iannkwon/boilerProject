@@ -10,19 +10,23 @@
     android:id="@+id/layout1">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-       android:layout_marginTop="90dp">
-
+       android:layout_marginTop="20dp">
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/icon"
+            android:layout_gravity="center"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Boiler Control App"
+            android:text="Boiler Control"
             android:textStyle="bold"
             android:textColor="#E5E2DB"
             android:textAlignment="center"
             android:layout_gravity="center"
-            android:textSize="40dp"/>
+            android:textSize="30sp"/>
         <EditText
             android:id="@+id/et_id"
             android:layout_width="150dp"
@@ -36,7 +40,7 @@
             android:maxLines="1"
             android:maxLength="10"
             android:layout_gravity="center"
-            android:layout_marginTop="90dp"/>
+            android:layout_marginTop="20dp"/>
 
         <EditText
             android:id="@+id/et_pw"
@@ -51,6 +55,18 @@
             android:maxLines="1"
             android:maxLength="15"
             android:layout_gravity="center"/>
+
+        <CheckBox
+            android:id="@+id/cb_id"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="ID Save"
+            android:textColor="#E5E2DB"
+            android:layout_gravity="center"
+            android:layout_marginRight="40dp"
+
+            />
+
 
         <Button
             android:id="@+id/btn_login"

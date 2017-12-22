@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_refresh"
+        android:title="refresh"
+        android:icon="@drawable/refresh"
+        app:showAsAction="always"
+        />
+
+    <item
+        android:id="@+id/menu_overflow"
+        android:title="submenu"
+        android:icon="@drawable/setting4"
+        app:showAsAction="always">
+        <menu>
+            <item
+                android:id="@+id/action_device"
+                android:title="Add devicce"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/action_setting"
+                android:title="setting"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+
+
+</menu>

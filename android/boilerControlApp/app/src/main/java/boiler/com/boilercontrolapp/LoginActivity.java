@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import javax.net.ssl.X509TrustManager;
 public class LoginActivity extends AppCompatActivity {
     EditText et_id;
     EditText et_pw;
+    CheckBox cb_id;
 
     TextView tv_member;
 
@@ -58,17 +61,57 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        et_id = (EditText)findViewById(R.id.et_id);
+        et_pw = (EditText)findViewById(R.id.et_pw);
+        layout1 = (LinearLayout)findViewById(R.id.layout1);
+        tv_member = (TextView) findViewById(R.id.tv_member);
+        cb_id = (CheckBox)findViewById(R.id.cb_id);
 
+        Log.i("Check>>>", SessionNow.getSession(this, "check"));
+        Log.i("Check id>>>", SessionNow.getSession(this, "id"));
+
+        if ( SessionNow.getSession(this, "check") == "true"){
+            Log.i("check true>>>","ok");
+            cb_id.setChecked(true);
+            et_id.setText(SessionNow.getSession(this, "id"));
+        }else{
+            cb_id.setChecked(false);
+        }
+
+        checkBox();         // id체크
         loginGo();          // 로그인 클릭시
         memberGO();        // 회원가입
         clickHide();        // 에디텍스트 이외 클릭 키보드 숨기기
+
+
+
+    }
+    private void checkBox(){
+
+
+        cb_id.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b) {
+                    Toast.makeText(getApplicationContext(), "ID Save", Toast.LENGTH_SHORT).show();
+                    SessionNow.setSession(getApplicationContext(), "check", "true");
+//                    SessionNow.setSession(getApplicationContext(), "id", id);
+                    Log.i("Check>>>", SessionNow.getSession(getApplicationContext(), "check"));
+                    Log.i("Check id>>>", SessionNow.getSession(getApplicationContext(), "id"));
+                }else{
+                    SessionNow.setSession(getApplicationContext(), "check", "false");
+                    Log.i("Check>>>", SessionNow.getSession(getApplicationContext(), "check"));
+                }
+            }
+        });
+
     }
 
     // 클릭 키보드 숨김
     private void clickHide(){
         // 텍스트 클릭시 화면 올리기
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        layout1 = (LinearLayout)findViewById(R.id.layout1);
+
         layout1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -79,7 +122,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void memberGO(){
-        tv_member = (TextView) findViewById(R.id.tv_member);
+
 
         tv_member.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,7 +143,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 // 내용이 빈값일 때 저장 못하게 하기
                 if (id.equals("") || password.equals("")){
-                    Toast.makeText(getApplicationContext(),"내용을 넣어주세요.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(),"Input ID,PW.", Toast.LENGTH_SHORT).show();
                 }else{
                     sendInfo();     // 서버에 로그인 정보 보내기
                 }
@@ -108,14 +151,13 @@ public class LoginActivity extends AppCompatActivity {
         });
     }
 
-    // 로그인 정보 가져오기 (동,호수,패스워드)
+    // 로그인 정보
     private void getInfo(){
-        et_id = (EditText)findViewById(R.id.et_id);
-        et_pw = (EditText)findViewById(R.id.et_pw);
-
         id = et_id.getText().toString();
         password = et_pw.getText().toString();
+
     }
+
 
     // 로그인 정보 보내기
     private void sendInfo(){
@@ -220,17 +262,6 @@ public class LoginActivity extends AppCompatActivity {
 
     // 확인후 결과
     private void showgo1(String re1){
-//        if (re1.equals("fail")){
-//            Toast.makeText(getApplicationContext(),"Login Failed", Toast.LENGTH_SHORT).show();
-//        }else{
-//            Toast.makeText(getApplicationContext(),"Login Successed", Toast.LENGTH_SHORT).show();
-//            SessionNow.setSession(this,"token1", re1);
-//
-//            Intent in=new Intent(LoginActivity.this, MainActivity.class);
-//            startActivity(in);
-//            finish();
-//        }
-
         Log.i("Cookie Result",token+signature);
         String[] result2 = token.split("=|;");
         for (int i=0; i<result2.length ; i++){
@@ -249,6 +280,7 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(),"Login Successed",Toast.LENGTH_LONG).show();
                 SessionNow.setSession(this,"token1", result2[1]);
                 SessionNow.setSession(this,"token2", result3[1]);
+                SessionNow.setSession(this,"id", id);
 
                 Intent in=new Intent(LoginActivity.this,MainActivity.class);
                 startActivity(in);
@@ -263,14 +295,10 @@ public class LoginActivity extends AppCompatActivity {
         TrustManager[] trustAllCerts  = new TrustManager[]{new X509TrustManager() {
             @Override
             public void checkClientTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
             }
-
             @Override
             public void checkServerTrusted(X509Certificate[] x509Certificates, String s) throws CertificateException {
-
             }
-
             @Override
             public X509Certificate[] getAcceptedIssuers() {
                 return new X509Certificate[0];
@@ -284,6 +312,5 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
 }// end class
