@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
                         switch (abList[i]){
-                            case "Modify":
+                            case "Room Name Modify":
                                 final EditText nameUpdate = new EditText(MainActivity.this);
                                 nameUpdate.setFilters(new InputFilter[]{new InputFilter.LengthFilter(8)}); // 글자수 제한
 

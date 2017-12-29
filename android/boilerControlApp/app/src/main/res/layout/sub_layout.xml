@@ -55,10 +55,10 @@
             android:layout_marginTop="15dp"
             android:text="indoor"
             android:textStyle="bold"
-            android:textColor="#FFBA46"
+            android:textColor="#B06457"
             android:textSize="15dp"
             android:visibility="invisible"
-            android:background="#FC523D" />
+            android:background="#F9C4A4" />
 
         <TextView
             android:id="@+id/tv_Current"
@@ -184,7 +184,7 @@
             android:text="Room1"
             android:textSize="20sp"
             android:textStyle="bold"
-            android:textColor="#FC523D"
+            android:textColor="#B06457"
             android:maxLength="9"
             android:maxLines="1"/>
 
